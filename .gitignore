@@ -1,0 +1,51 @@
+HELP.md
+
+# Maven / Spring Boot
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Keep target folders inside src if any
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+# VS Code
+.vscode/
+
+# Frontend
+library-frontend/node_modules/
+library-frontend/dist/
+library-frontend/build/
+
+# Backend
+library-backend/target/
+
+# Environment files
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db

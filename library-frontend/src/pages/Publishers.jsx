@@ -1,0 +1,108 @@
+import { useState } from 'react';
+import { Plus, Pencil, Trash2, Building2 } from 'lucide-react';
+
+export default function Publishers({ data, onUpdate }) {
+  const [showModal, setShowModal] = useState(false);
+  const [editPublisher, setEditPublisher] = useState(null);
+  const [form, setForm] = useState({});
+
+  const openAdd = () => {
+    setEditPublisher(null);
+    setForm({ name: '', location: '', founded: '' });
+    setShowModal(true);
+  };
+
+  const openEdit = (pub) => {
+    setEditPublisher(pub);
+    setForm({ ...pub });
+    setShowModal(true);
+  };
+
+  const handleSave = () => {
+    if (!form.name) return;
+    if (editPublisher) {
+      const updated = data.publishers.map(p => p.id === editPublisher.id ? { ...p, ...form } : p);
+      onUpdate({ ...data, publishers: updated });
+    } else {
+      onUpdate({ ...data, publishers: [...data.publishers, { ...form, id: Date.now() }] });
+    }
+    setShowModal(false);
+  };
+
+  const handleDelete = (id) => {
+    if (confirm('Delete this publisher?')) {
+      onUpdate({ ...data, publishers: data.publishers.filter(p => p.id !== id) });
+    }
+  };
+
+  const bookCountForPublisher = (pubId) => data.books.filter(b => b.publisherId === pubId).length;
+
+  return (
+    <div className="page-content">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Publishers</h1>
+          <p className="page-subtitle">The houses that bring books into the world.</p>
+        </div>
+        <button className="btn-primary" onClick={openAdd}>
+          <Plus size={16} /> Add Publisher
+        </button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        {data.publishers.map(pub => {
+          const count = bookCountForPublisher(pub.id);
+          return (
+            <div key={pub.id} className="card">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{
+                  width: 46, height: 46, borderRadius: 10,
+                  background: 'var(--green-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                }}>
+                  <Building2 size={20} color="var(--gold)" />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 16 }}>{pub.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{pub.location} · Est. {pub.founded}</div>
+                </div>
+              </div>
+              <div className="divider" />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{count} {count === 1 ? 'book' : 'books'} in catalog</span>
+                <div style={{ display: 'flex', gap: 2 }}>
+                  <button className="btn-icon" onClick={() => openEdit(pub)}><Pencil size={14} /></button>
+                  <button className="btn-icon danger" onClick={() => handleDelete(pub.id)}><Trash2 size={14} /></button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {data.publishers.length === 0 && <div className="empty-state" style={{ gridColumn: '1/-1' }}>No publishers yet.</div>}
+      </div>
+
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2 className="modal-title">{editPublisher ? 'Edit Publisher' : 'Add Publisher'}</h2>
+            <div className="form-group">
+              <label className="form-label">Publisher Name</label>
+              <input className="form-input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Location</label>
+              <input className="form-input" value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Founded Year</label>
+              <input className="form-input" type="number" value={form.founded || ''} onChange={e => setForm({ ...form, founded: e.target.value })} />
+            </div>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleSave}>{editPublisher ? 'Save Changes' : 'Add Publisher'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
