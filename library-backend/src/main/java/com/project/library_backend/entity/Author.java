@@ -17,6 +17,8 @@ public class Author {
 	private int id;
 	private String name;
 	private String nationality;
+	private String bio;
+	private long bookCount ;
 	@ManyToMany
 	@JoinTable(name = "author_book", joinColumns = @JoinColumn(name = "author_id"), inverseJoinColumns = @JoinColumn(name = "book_id"))
 	private List<Book> books;

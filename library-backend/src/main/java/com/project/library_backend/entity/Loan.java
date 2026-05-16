@@ -19,6 +19,7 @@ public class Loan {
 	private LocalDate issuedate;
 	private LocalDate duedate;
 	private LocalDate returndate;
+	private String Status;
 
 	@ManyToOne
 	@JoinColumn(name = "member_id")

@@ -1,8 +1,32 @@
 import { BookOpen, Users, BookMarked, Receipt, ArrowRight, AlertTriangle } from 'lucide-react';
+import { use, useEffect, useState } from 'react';
 
 export default function Dashboard({ data, onNavigate }) {
-  const totalBooks = data.books.reduce((s, b) => s + b.totalCopies, 0);
-  const availableBooks = data.books.reduce((s, b) => s + b.availableCopies, 0);
+ const [totalBooks, setTotalBooks] = useState(0);
+ const [totalMembers , setTotalMembers] = useState(0);
+ const [availableBooks,setavAilableBooks] =useState(0);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/countofbooks')
+      .then(res => res.json())
+      .then(count => {setTotalBooks(count)})
+      .catch(err => console.log(err));
+  }, []);
+
+  useEffect(()=>{
+       fetch("http://localhost:8080/countofmembers")
+       .then(res => res.json())
+       .then(count => {setTotalMembers(count)})
+       .catch(err => console.log(err));
+  },[])
+
+  useEffect(()=>{
+    fetch("http://localhost:8080/availablebookscount")
+    .then(res => res.json())
+    .then(count =>{ setavAilableBooks(count)})
+    .catch(err => console.log(err));
+  })
+
   const activeLoans = data.loans.filter(l => l.status !== 'Returned');
   const overdueLoans = activeLoans.filter(l => l.status === 'Overdue');
   const unpaidFines = data.fines.filter(f => !f.paid);
@@ -71,7 +95,7 @@ export default function Dashboard({ data, onNavigate }) {
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
         <StatCard label="TOTAL BOOKS" value={totalBooks} sub={`${availableBooks} available now`} icon={<BookOpen size={18} />} accent={false} />
-        <StatCard label="MEMBERS" value={data.members.length} sub={`${data.authors.length} authors indexed`} icon={<Users size={18} />} accent={false} />
+        <StatCard label="MEMBERS" value={totalMembers} sub={`${data.authors.length} authors indexed`} icon={<Users size={18} />} accent={false} />
         <StatCard label="ACTIVE LOANS" value={activeLoans.length} sub={`${overdueLoans.length} overdue`} icon={<BookMarked size={18} />} accent={overdueLoans.length > 0} />
         <StatCard label="UNPAID FINES" value={`$${unpaidTotal}`} sub="Across all members" icon={<Receipt size={18} />} accent={unpaidTotal > 0} />
       </div>
