@@ -1,5 +1,6 @@
 package com.project.library_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ public class Publisher {
 	private String address;
 	private long phone;
 	@OneToMany(mappedBy = "publisher")
-	
+	@JsonIgnore
 	private List<Book> books;
 
 	public List<Book> getBooks() {

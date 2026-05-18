@@ -1,6 +1,6 @@
 package com.project.library_backend.controller;
 
-import com.project.library_backend.service.MemberService;
+import com.project.library_backend.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 @CrossOrigin(origins = "http://localhost:5173")
-public class MemberController {
+public class AuthorController {
 
     @Autowired
-    MemberService service ;
+    AuthorService service;
 
-    @GetMapping("/countofmembers")
-    public long countOfMember(){
-       return service.countOfMember();
+    @GetMapping("/countofauthors")
+    public long countOfAuthors(){
+     return service.countOfAuthors();
     }
+
+
 }

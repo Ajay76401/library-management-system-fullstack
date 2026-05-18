@@ -5,6 +5,38 @@ export default function Dashboard({ data, onNavigate }) {
  const [totalBooks, setTotalBooks] = useState(0);
  const [totalMembers , setTotalMembers] = useState(0);
  const [availableBooks,setavAilableBooks] =useState(0);
+ const [totalAuthors, setTotalAuthors] = useState(0);
+ const [activeLoans ,setActiveLoans] = useState(0);
+ const [overdueLoans ,setOverdueLoans]  = useState([]);
+ const[fines ,setFines] = useState([]);
+ const [recentLoans ,setRecentLoans] = useState([]);
+
+ useEffect(()=>{
+    fetch("http://localhost:8080/recentloans")
+    .then(res => res.json())
+    .then(data => setRecentLoans(data))
+    .catch(err => console.log(err))
+ },[])
+
+useEffect(()=>{
+  fetch("http://localhost:8080/fines")
+  .then(res => res.json())
+  .then(data =>setFines(data))
+  .catch(err => console.log(err))
+},[])
+ useEffect(()=>{
+     fetch("http://localhost:8080/activeloans")
+     .then(res => res.json())
+     .then(count => setActiveLoans(count))
+     .catch(err => console.log(err))
+ },[])
+
+ useEffect(()=>{
+     fetch('http://localhost:8080/countofauthors')
+     .then(res => res.json())
+     .then(count => setTotalAuthors(count))
+     .catch(err => console.log(err));
+ },[])
 
   useEffect(() => {
     fetch('http://localhost:8080/countofbooks')
@@ -25,16 +57,21 @@ export default function Dashboard({ data, onNavigate }) {
     .then(res => res.json())
     .then(count =>{ setavAilableBooks(count)})
     .catch(err => console.log(err));
-  })
+  },[])
 
-  const activeLoans = data.loans.filter(l => l.status !== 'Returned');
-  const overdueLoans = activeLoans.filter(l => l.status === 'Overdue');
-  const unpaidFines = data.fines.filter(f => !f.paid);
-  const unpaidTotal = unpaidFines.reduce((s, f) => s + f.amount, 0);
+   useEffect(()=>{
+    fetch("http://localhost:8080/overdueloans")
+    .then(res => res.json())
+    .then(data => setOverdueLoans(data))
+    .catch(err => console.log(err))
+ },[])
 
-  const recentLoans = [...data.loans]
-    .sort((a, b) => new Date(b.issuedDate) - new Date(a.issuedDate))
-    .slice(0, 4);
+  const unpaidFines =fines.filter(f=>f.status!=="PAID")
+  const unpaidTotal = unpaidFines.reduce((sum,fine)=>sum+fine.amount,0);
+
+  // const recentLoans = [...data.loans]
+  //   .sort((a, b) => new Date(b.issuedDate) - new Date(a.issuedDate))
+  //   .slice(0, 4);
 
   const attentionItems = [
     ...overdueLoans,
@@ -95,8 +132,8 @@ export default function Dashboard({ data, onNavigate }) {
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
         <StatCard label="TOTAL BOOKS" value={totalBooks} sub={`${availableBooks} available now`} icon={<BookOpen size={18} />} accent={false} />
-        <StatCard label="MEMBERS" value={totalMembers} sub={`${data.authors.length} authors indexed`} icon={<Users size={18} />} accent={false} />
-        <StatCard label="ACTIVE LOANS" value={activeLoans.length} sub={`${overdueLoans.length} overdue`} icon={<BookMarked size={18} />} accent={overdueLoans.length > 0} />
+        <StatCard label="MEMBERS" value={totalMembers} sub={`${totalAuthors} authors indexed`} icon={<Users size={18} />} accent={false} />
+        <StatCard label="ACTIVE LOANS" value={activeLoans} sub={`${overdueLoans.length} overdue`} icon={<BookMarked size={18} />} accent={overdueLoans.length > 0} />
         <StatCard label="UNPAID FINES" value={`$${unpaidTotal}`} sub="Across all members" icon={<Receipt size={18} />} accent={unpaidTotal > 0} />
       </div>
 
@@ -116,8 +153,8 @@ export default function Dashboard({ data, onNavigate }) {
           {recentLoans.map(loan => (
             <div key={loan.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderTop: '1px solid var(--border)' }}>
               <div>
-                <div style={{ fontWeight: 500, fontSize: 14 }}>{loan.bookTitle}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{loan.memberName} · due {loan.dueDate}</div>
+                <div style={{ fontWeight: 500, fontSize: 14 }}>{loan.bookcopy.book.title}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{loan.member.name} · due {loan.duedate}</div>
               </div>
               <span className={`badge badge-${loan.status.toLowerCase()}`}>{loan.status}</span>
             </div>

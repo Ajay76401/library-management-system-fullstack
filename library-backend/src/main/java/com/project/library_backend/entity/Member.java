@@ -1,5 +1,7 @@
 package com.project.library_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,9 +22,11 @@ public class Member {
 	private LocalDate joindate;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Loan> loans;
 
 	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnoreProperties("member")
 	private Account account;
 
 	public Member(String name, String address, String phone, LocalDate joindate) {

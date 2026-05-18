@@ -1,5 +1,7 @@
 package com.project.library_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,17 +21,20 @@ public class Loan {
 	private LocalDate issuedate;
 	private LocalDate duedate;
 	private LocalDate returndate;
-	private String Status;
+	private String status;
 
 	@ManyToOne
 	@JoinColumn(name = "member_id")
+	@JsonIgnoreProperties("loans")
 	private Member member;
 
 	@OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Fine> fines;
 
 	@ManyToOne
 	@JoinColumn(name = "bookCopy_id")
+	@JsonIgnoreProperties("loans")
 	private Bookcopies bookcopy;
 
 }

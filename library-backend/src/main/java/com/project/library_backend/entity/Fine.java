@@ -18,6 +18,12 @@ public class Fine {
 	private LocalDate finedate;
 	private String status;
 
+//	ISSUED,
+//	RETURNED,
+//	OVERDUE,
+//	LOST,
+//	DAMAGED
+
 	@ManyToOne
 	@JoinColumn(name = "loan_id")
 	private Loan loan;
