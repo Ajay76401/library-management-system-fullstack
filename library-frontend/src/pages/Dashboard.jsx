@@ -1,5 +1,5 @@
-import { BookOpen, Users, BookMarked, Receipt, ArrowRight, AlertTriangle } from 'lucide-react';
-import { use, useEffect, useState } from 'react';
+import { AlertTriangle, ArrowRight, BookMarked, BookOpen, Receipt, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function Dashboard({ data, onNavigate }) {
  const [totalBooks, setTotalBooks] = useState(0);
@@ -66,7 +66,7 @@ useEffect(()=>{
     .catch(err => console.log(err))
  },[])
 
-  const unpaidFines =fines.filter(f=>f.status!=="PAID")
+  const unpaidFines =fines.filter(f=>f.status!=="Paid")
   const unpaidTotal = unpaidFines.reduce((sum,fine)=>sum+fine.amount,0);
 
   // const recentLoans = [...data.loans]
@@ -77,7 +77,6 @@ useEffect(()=>{
     ...overdueLoans,
     ...unpaidFines.map(f => ({ ...f, isFineConcern: true }))
   ];
-
   return (
     <div className="page-content">
       {/* Hero banner */}
@@ -150,7 +149,7 @@ useEffect(()=>{
               View all <ArrowRight size={14} />
             </button>
           </div>
-          {recentLoans.map(loan => (
+          {recentLoans.slice(0,4).map(loan => (
             <div key={loan.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderTop: '1px solid var(--border)' }}>
               <div>
                 <div style={{ fontWeight: 500, fontSize: 14 }}>{loan.bookcopy.book.title}</div>
@@ -163,28 +162,102 @@ useEffect(()=>{
 
         {/* Needs attention */}
         <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <AlertTriangle size={16} color="#e09b3a" />
-            <span style={{ fontFamily: 'Playfair Display, serif', fontSize: 18, fontWeight: 700 }}>Needs attention</span>
+
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 16
+        }}>
+          <AlertTriangle size={16} color="#e09b3a" />
+          <span style={{
+            fontFamily: 'Playfair Display, serif',
+            fontSize: 18,
+            fontWeight: 700
+          }}>
+            Needs attention
+          </span>
+        </div>
+
+        {overdueLoans.length === 0 && unpaidFines.length === 0 ? (
+
+          <div className="empty-state">
+            All clear! No issues.
           </div>
-          {attentionItems.length === 0 ? (
-            <div className="empty-state">All clear! No issues.</div>
-          ) : (
-            attentionItems.map((item, i) => (
-              <div key={i} style={{
-                background: 'var(--red-light)',
-                border: '1px solid #f5c6c2',
-                borderRadius: 8,
-                padding: '12px 14px',
-                marginBottom: 10
-              }}>
-                <div style={{ fontWeight: 500, fontSize: 14 }}>{item.bookTitle}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                  {item.memberName} · due {item.dueDate || 'N/A'}
+
+        ) : (
+
+          <>
+          
+            {/* Overdue Loans */}
+            {overdueLoans.map((loan, i) => (
+
+              <div
+                key={`loan-${i}`}
+                style={{
+                  background: 'var(--red-light)',
+                  border: '1px solid #f5c6c2',
+                  borderRadius: 8,
+                  padding: '12px 14px',
+                  marginBottom: 10
+                }}
+              >
+                <div style={{
+                  fontWeight: 500,
+                  fontSize: 14
+                }}>
+                  {loan.bookcopy?.book?.title}
                 </div>
+
+                <div style={{
+                  fontSize: 12,
+                  color: 'var(--text-muted)',
+                  marginTop: 2
+                }}>
+                  {loan.member?.name} · due {loan.duedate}
+                </div>
+
               </div>
-            ))
-          )}
+
+            ))}
+
+            {/* Unpaid Fines */}
+            {unpaidFines.map((fine, i) => (
+
+              <div
+                key={`fine-${i}`}
+                style={{
+                  background: '#fff4e5',
+                  border: '1px solid #ffd59e',
+                  borderRadius: 8,
+                  padding: '12px 14px',
+                  marginBottom: 10
+                }}
+              >
+
+                <div style={{
+                  fontWeight: 500,
+                  fontSize: 14
+                }}>
+                  Unpaid Fine - ${fine.amount}
+                </div>
+
+                <div style={{
+                  fontSize: 12,
+                  color: 'var(--text-muted)',
+                  marginTop: 2
+                }}>
+                  Fine pending
+                </div>
+
+              </div>
+
+            ))}
+
+          </>
+
+        )}
+
         </div>
       </div>
     </div>

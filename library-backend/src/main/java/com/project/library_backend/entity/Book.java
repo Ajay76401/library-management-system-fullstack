@@ -1,6 +1,7 @@
 package com.project.library_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,16 +18,24 @@ public class Book {
 	private String title;
 	private int yop;
 	private double price;
+	private String isbn;
+	private String category;
+
 	@ManyToOne
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
-	@ManyToMany(mappedBy = "books")
-	@JsonIgnore
+	@ManyToMany
+	@JoinTable(
+			name = "author_book",
+			joinColumns = @JoinColumn(name = "book_id"),
+			inverseJoinColumns = @JoinColumn(name = "author_id")
+	)
+	@JsonIgnoreProperties("books")
 	private List<Author> authors;
 
 	@OneToMany(mappedBy = "book")
-	@JsonIgnore
+	@JsonIgnoreProperties("book")
 	private List<Bookcopies> bookCopies;
 
 	public Book(String title, int yop, double price) {

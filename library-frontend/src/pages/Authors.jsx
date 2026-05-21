@@ -1,10 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, PenTool } from 'lucide-react';
 
 export default function Authors({ data, onUpdate }) {
   const [showModal, setShowModal] = useState(false);
   const [editAuthor, setEditAuthor] = useState(null);
   const [form, setForm] = useState({});
+  const [authors, setAuthors] = useState([]);
+  
+  useEffect(() => {
+   fetchAuthors();
+  }, []);
+
+  const fetchAuthors = async () => {
+  try {
+    const response = await fetch("http://localhost:8080/authors");
+    const data = await response.json();
+    setAuthors(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   const openAdd = () => {
     setEditAuthor(null);
@@ -18,24 +33,46 @@ export default function Authors({ data, onUpdate }) {
     setShowModal(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async() => {
     if (!form.name) return;
-    if (editAuthor) {
-      const updated = data.authors.map(a => a.id === editAuthor.id ? { ...a, ...form } : a);
-      onUpdate({ ...data, authors: updated });
+    try{
+      if (editAuthor) {
+      await  fetch(`http://localhost:8080/updateauthor/${editAuthor.id}`,{
+        method:"PUT",
+        headers:{
+        "Content-Type":"application/json"
+        },
+        body: JSON.stringify(form)
+     })
     } else {
-      const newA = { ...form, id: Date.now(), bookCount: 0 };
-      onUpdate({ ...data, authors: [...data.authors, newA] });
+     await fetch("http://localhost:8080/addauthor" ,{
+      method :"POST",
+      headers: { "Content-Type" : "application/json"},
+       body: JSON.stringify(form)
+     });
     }
+     fetchAuthors();
     setShowModal(false);
-  };
+  }
+  catch(error){
+     console.log(error)
+  }
+}
 
-  const handleDelete = (id) => {
-    if (confirm('Delete this author?')) {
-      onUpdate({ ...data, authors: data.authors.filter(a => a.id !== id) });
-    }
-  };
+ const handleDelete = async (id) => {
 
+  if (confirm('Delete this author?')) {
+    try {
+      await fetch(`http://localhost:8080/removeauthor/${id}`, {
+        method: 'DELETE'
+      });
+      fetchAuthors();
+    } catch (error) {
+      console.log(error);
+  }
+  }
+};
+  
   const bookCountForAuthor = (authorId) => data.books.filter(b => b.authorId === authorId).length;
 
   return (
@@ -51,7 +88,7 @@ export default function Authors({ data, onUpdate }) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        {data.authors.map(author => {
+        {authors.map(author => {
           const count = bookCountForAuthor(author.id);
           return (
             <div key={author.id} className="card">
@@ -84,7 +121,7 @@ export default function Authors({ data, onUpdate }) {
             </div>
           );
         })}
-        {data.authors.length === 0 && <div className="empty-state" style={{ gridColumn: '1/-1' }}>No authors yet.</div>}
+        {authors.length === 0 && <div className="empty-state" style={{ gridColumn: '1/-1' }}>No authors yet.</div>}
       </div>
 
       {showModal && (

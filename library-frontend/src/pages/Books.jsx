@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState ,useEffect } from 'react';
 import { Search, Plus, Pencil, Trash2, BookOpen } from 'lucide-react';
 
 export default function Books({ data, onUpdate }) {
@@ -6,13 +6,48 @@ export default function Books({ data, onUpdate }) {
   const [showModal, setShowModal] = useState(false);
   const [editBook, setEditBook] = useState(null);
   const [form, setForm] = useState({});
+  const [books,setBooks] = useState([]);
+  const [authors,setAuthors] = useState([]);  
+  const [publishers,setPublishers] = useState([]);
 
-  const filtered = data.books.filter(b =>
-    b.title.toLowerCase().includes(search.toLowerCase()) ||
-    b.authorName.toLowerCase().includes(search.toLowerCase()) ||
-    b.category.toLowerCase().includes(search.toLowerCase()) ||
-    b.isbn.includes(search)
-  );
+  useEffect(() => {
+   fetch(`http://localhost:8080/authors`)
+    .then(res => res.json())
+    .then(data => setAuthors(data))
+    .catch(error => console.log(error));
+  }, []);     
+
+  useEffect(() => {
+    fetch(`http://localhost:8080/publishers`)
+     .then(res => res.json())
+     .then(data => setPublishers(data))
+     .catch(error => console.log(error));
+  }, []);
+
+useEffect(() => {
+  fetchBooks();
+}, []);
+
+const fetchBooks = async () => {
+  
+ try {
+    const res = await fetch("http://localhost:8080/books")
+    const data = await res.json();
+    setBooks(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+ const filtered = books.filter(b =>
+  b.title?.toLowerCase().includes(search.toLowerCase()) ||
+  b.category?.toLowerCase().includes(search.toLowerCase()) ||
+  b.isbn?.includes(search) ||
+  b.authors?.some(a =>
+    a.name?.toLowerCase().includes(search.toLowerCase())
+  )
+);
 
   const openAdd = () => {
     setEditBook(null);
@@ -22,35 +57,93 @@ export default function Books({ data, onUpdate }) {
 
   const openEdit = (book) => {
     setEditBook(book);
-    setForm({ ...book });
-    setShowModal(true);
+    
+    setForm({
+      ...book,
+      authorId: book.authors?.[0]?.id || '',
+      publisherId: book.publisher?.id || '',
+      year: book.yop
+    });
+      setShowModal(true);
   };
 
-  const handleSave = () => {
-    if (!form.title) return;
-    const author = data.authors.find(a => a.id === parseInt(form.authorId));
-    const publisher = data.publishers.find(p => p.id === parseInt(form.publisherId));
-    if (editBook) {
-      const updated = data.books.map(b => b.id === editBook.id
-        ? { ...b, ...form, authorId: parseInt(form.authorId), publisherId: parseInt(form.publisherId), authorName: author?.name || b.authorName, publisherName: publisher?.name || b.publisherName, totalCopies: parseInt(form.totalCopies), availableCopies: parseInt(form.totalCopies) }
-        : b);
-      onUpdate({ ...data, books: updated });
-    } else {
-      const newBook = {
-        ...form, id: Date.now(), authorId: parseInt(form.authorId), publisherId: parseInt(form.publisherId),
-        authorName: author?.name || '', publisherName: publisher?.name || '',
-        totalCopies: parseInt(form.totalCopies) || 1, availableCopies: parseInt(form.totalCopies) || 1
-      };
-      onUpdate({ ...data, books: [...data.books, newBook] });
-    }
-    setShowModal(false);
-  };
+  const handleSave = async () => {
+    if (
+        !form.title ||
+        !form.authorId ||
+        !form.publisherId ||
+        !form.year
+      ) {
+        alert("Please fill all fields");
+        return;
+      }
 
-  const handleDelete = (id) => {
-    if (confirm('Delete this book?')) {
-      onUpdate({ ...data, books: data.books.filter(b => b.id !== id) });
+      try {
+        const bookData = {
+          title: form.title,
+          yop: Number(form.year),
+          isbn: form.isbn,
+          category: form.category,
+          price: 0,
+          publisherId: Number(form.publisherId),
+          authorId: Number(form.authorId),
+         
+        };
+        console.log(bookData);
+        // UPDATE BOOK
+        if (editBook) {
+          await fetch(`http://localhost:8080/updatebook/${editBook.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bookData)
+          });
+        }
+        // ADD BOOK
+        else {
+            bookData.totalCopies = Number(form.totalCopies);
+            await fetch("http://localhost:8080/addbook", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bookData)
+          });
+
+        }
+        // REFRESH UI
+        await fetchBooks();
+        
+        setShowModal(false);
+      } catch (error) {
+        console.log(error);
+      }
+};
+
+ const handleDelete = async (id) => {
+  if (confirm('Delete this book?')) {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/removebook/${id}`,
+        {
+          method: "DELETE"
+        });
+
+      if (!response.ok) {
+        const message = await response.text();
+        console.log(message);
+        alert(message);
+        return;
+      }
+      await fetchBooks();
+
+    }catch (error) {
+      console.log(error);
+      alert("Something went wrong");
     }
-  };
+  }
+};
 
   return (
     <div className="page-content">
@@ -87,20 +180,24 @@ export default function Books({ data, onUpdate }) {
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 6 }}>
                 <div style={{ fontWeight: 600, fontSize: 15, flex: 1, paddingRight: 8 }}>{book.title}</div>
                 <span className="badge badge-available" style={{ flexShrink: 0 }}>
-                  {book.availableCopies > 0 ? 'Available' : 'Unavailable'}
+                 {
+                book.bookCopies?.some(c => c.status === "Available")
+                  ? 'Available'
+                  : 'Unavailable'
+                }
                 </span>
               </div>
               <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 10 }}>
-                {book.authorName} · {book.year}
+                {book.authors?.map(a => a.name).join(", ")} · {book.yop}
               </div>
               <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
                 <span style={{ background: 'var(--cream-dark)', borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 500 }}>{book.category}</span>
-                <span style={{ background: 'var(--cream-dark)', borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 500 }}>{book.publisherName}</span>
+                <span style={{ background: 'var(--cream-dark)', borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 500 }}>{book.publisher?.name}</span>
               </div>
               <div className="divider" style={{ margin: '0 0 10px' }} />
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                  {book.availableCopies}/{book.totalCopies} copies · {book.isbn}
+                  {book.bookCopies?.filter(copy => copy.status === "Available").length}/{book.bookCopies?.length} copies · {book.isbn}
                 </span>
                 <div style={{ display: 'flex', gap: 2 }}>
                   <button className="btn-icon" onClick={() => openEdit(book)}><Pencil size={14} /></button>
@@ -126,14 +223,14 @@ export default function Books({ data, onUpdate }) {
                 <label className="form-label">Author</label>
                 <select className="form-select" value={form.authorId || ''} onChange={e => setForm({ ...form, authorId: e.target.value })}>
                   <option value="">Select author</option>
-                  {data.authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Publisher</label>
                 <select className="form-select" value={form.publisherId || ''} onChange={e => setForm({ ...form, publisherId: e.target.value })}>
                   <option value="">Select publisher</option>
-                  {data.publishers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  {publishers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>
             </div>
@@ -142,10 +239,12 @@ export default function Books({ data, onUpdate }) {
                 <label className="form-label">Year</label>
                 <input className="form-input" type="number" value={form.year || ''} onChange={e => setForm({ ...form, year: e.target.value })} />
               </div>
+              {!editBook && (
               <div className="form-group">
                 <label className="form-label">Copies</label>
-                <input className="form-input" type="number" min="1" value={form.totalCopies || 1} onChange={e => setForm({ ...form, totalCopies: e.target.value })} />
+                <input className="form-input" type="number" min="1" max="500" value={form.totalCopies || 1} onChange={e => setForm({ ...form, totalCopies: e.target.value })} />
               </div>
+              )}
             </div>
             <div className="form-group">
               <label className="form-label">ISBN</label>

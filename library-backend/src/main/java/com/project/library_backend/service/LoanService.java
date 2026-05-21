@@ -18,11 +18,11 @@ public class LoanService {
     LoanRepository repo;
 
     public long countOfActiveLoans() {
-        return repo.countByStatusIn(List.of("ISSUED" ,"OVERDUE"));
+        return repo.countByStatusIn(List.of("Issued" ,"Overdue"));
     }
 
     public List<Loan> countOfOverdueLoans() {
-       return repo.findByStatus("OVERDUE") ;
+       return repo.findByStatus("Overdue") ;
     }
 
     public List<Loan> recentLoans() {

@@ -19,8 +19,8 @@ public class FineController {
     FineService service;
 
     @GetMapping("/fines")
-    public List<Fine> unpaidFines() {
-        return service.unpaidfines();
+    public List<Fine> fines() {
+        return service.fines();
     }
 
 }

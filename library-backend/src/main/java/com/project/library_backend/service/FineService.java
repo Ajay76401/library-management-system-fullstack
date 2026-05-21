@@ -14,7 +14,7 @@ public class FineService {
     FineRepository repo;
 
 
-    public List<Fine> unpaidfines() {
+    public List<Fine> fines() {
     return repo.findAll();
     }
 }
