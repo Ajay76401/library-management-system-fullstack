@@ -1,12 +1,10 @@
 package com.project.library_backend.controller;
 
+import com.project.library_backend.DTO.LoanRequest;
 import com.project.library_backend.entity.Loan;
 import com.project.library_backend.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,5 +31,21 @@ public class LoanController {
         return service.recentLoans();
     }
 
+    @GetMapping("/loans")
+    public List<Loan> getLoans(){
+        return service.getLoans();
+    }
+
+    @PutMapping("/returnloan/{id}")
+    public void returnLoan(@PathVariable int id){
+        service.returnLoan(id);
+    }
+
+    @PostMapping("/addloan")
+    public void addLoan(
+            @RequestBody LoanRequest request
+    ){
+        service.addLoan(request);
+    }
 
 }

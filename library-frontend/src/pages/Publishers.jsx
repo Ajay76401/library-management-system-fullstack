@@ -6,6 +6,23 @@ export default function Publishers({ data, onUpdate }) {
   const [editPublisher, setEditPublisher] = useState(null);
   const [form, setForm] = useState({});
   const [publishers , setPublishers] = useState([])
+    const[books, setBooks] = useState([]);
+  
+useEffect(() => {
+  fetchBooks();
+}, []);
+
+const fetchBooks = async () => {
+  
+ try {
+    const res = await fetch("http://localhost:8080/books")
+    const data = await res.json();
+    setBooks(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
   useEffect(()=>{
     fetch("http://localhost:8080/publishers")
@@ -81,7 +98,7 @@ export default function Publishers({ data, onUpdate }) {
     }
   };
 
-  const bookCountForPublisher = (pubId) => data.books.filter(b => b.publisherId === pubId).length;
+  const bookCountForPublisher = (pubId) => books.filter(b => b.publisher.id === pubId).length;
 
   return (
     <div className="page-content">
@@ -140,7 +157,7 @@ export default function Publishers({ data, onUpdate }) {
             </div>
             <div className="form-group">
               <label className="form-label">Phone</label>
-              <input className="form-input" type="number" value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} />
+              <input className="form-input" type="tel " value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} />
             </div>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>

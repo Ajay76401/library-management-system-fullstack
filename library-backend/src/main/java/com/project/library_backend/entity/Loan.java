@@ -1,5 +1,6 @@
 package com.project.library_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -28,9 +29,12 @@ public class Loan {
 	@JsonIgnoreProperties("loans")
 	private Member member;
 
-	@OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Fine> fines;
+	@OneToOne(mappedBy = "loan",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+
+	@JsonIgnoreProperties("loan")
+	private Fine fine;
 
 	@ManyToOne
 	@JoinColumn(name = "bookCopy_id")

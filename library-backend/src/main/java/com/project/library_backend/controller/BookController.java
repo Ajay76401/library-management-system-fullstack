@@ -25,8 +25,6 @@ public class BookController {
 
     @PostMapping("/addbook")
     public void addBook(@RequestBody BookRequest request) {
-        System.out.println(request.getAuthorId());
-        System.out.println(request.getPublisherId());
         service.addBook(request);
     }
 
@@ -46,5 +44,9 @@ public class BookController {
         service.updateBook(id,bookRequest);
     }
 
+    @GetMapping("availablebooks")
+    public List<Book> availableBooks(){
+        return service.availableBooks();
+    }
 
 }

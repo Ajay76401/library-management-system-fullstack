@@ -24,7 +24,7 @@ public class Fine {
 //	LOST,
 //	DAMAGED
 
-	@ManyToOne
+	@OneToOne
 	@JoinColumn(name = "loan_id")
 	private Loan loan;
 

@@ -1,22 +1,38 @@
-import { useState } from 'react';
-import { Search, Plus, Pencil, Trash2, Mail, Phone } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Search,   Plus,Pencil, Trash2, Mail, Phone } from 'lucide-react';
 
 export default function Members({ data, onUpdate }) {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editMember, setEditMember] = useState(null);
   const [form, setForm] = useState({});
+  const[members, setMembers] = useState([]);
 
-  const filtered = data.members.filter(m =>
+  useEffect(() => {
+      fetch(`http://localhost:8080/members`)
+      .then(res => res.json())
+      .then(data => setMembers(data))
+      .catch(err => console.error('Error fetching members:', err));
+  }, []);
+
+  const filtered = members.filter(m =>
     m.name.toLowerCase().includes(search.toLowerCase()) ||
     m.email.toLowerCase().includes(search.toLowerCase())
   );
 
-  const openAdd = () => {
-    setEditMember(null);
-    setForm({ name: '', email: '', phone: '', status: 'Active' });
-    setShowModal(true);
-  };
+ const openAdd = () => {
+
+  setEditMember(null);
+
+  setForm({
+    name: '',
+    email: '',
+    phone: '',
+    status: 'Active'
+  });
+
+  setShowModal(true);
+};
 
   const openEdit = (member) => {
     setEditMember(member);
@@ -24,23 +40,86 @@ export default function Members({ data, onUpdate }) {
     setShowModal(true);
   };
 
-  const handleSave = () => {
-    if (!form.name) return;
+  const handleSave = async () => {
+    if (
+  !form.name ||
+  !form.email ||
+  !form.phone
+   ) {
+  alert("Please fill all fields");
+  return;
+}
     if (editMember) {
-      const updated = data.members.map(m => m.id === editMember.id ? { ...m, ...form } : m);
-      onUpdate({ ...data, members: updated });
+      await fetch(`http://localhost:8080/updatemember/${editMember.id}`, {
+        method:"PUT",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          status: form.status
+        })
+      });
+   
     } else {
-      const newM = { ...form, id: Date.now(), joinedDate: new Date().toISOString().slice(0, 10), activeLoans: 0 };
-      onUpdate({ ...data, members: [...data.members, newM] });
+
+      await fetch(
+        "http://localhost:8080/addmember",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            joindate: new Date()
+              .toISOString()
+              .split("T")[0],
+
+            status: form.status
+          })
+        }
+      );
     }
+
+    // refresh
+    const res = await fetch(
+      "http://localhost:8080/members"
+    );
+    const data = await res.json();
+    setMembers(data);
     setShowModal(false);
   };
 
-  const handleDelete = (id) => {
-    if (confirm('Delete this member?')) {
-      onUpdate({ ...data, members: data.members.filter(m => m.id !== id) });
+  const handleDelete = async (id) => {
+  if (confirm('Delete this member?')) {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/removemember/${id}`,
+        {
+          method: "DELETE"
+        }
+      );
+      if (!response.ok) {
+        const message =
+          await response.text();
+          alert(message);
+          return;
+      }
+      setMembers(members.filter(m => m.id !== id));
+    } catch (error) {
+      console.log(error);
+      alert("Failed to delete member");
     }
-  };
+  }
+};
 
   const initials = (name) => name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
@@ -51,9 +130,10 @@ export default function Members({ data, onUpdate }) {
           <h1 className="page-title">Members</h1>
           <p className="page-subtitle">The readers who bring the library to life.</p>
         </div>
-        <button className="btn-primary" onClick={openAdd}>
-          <Plus size={16} /> Add Member
-        </button>
+          <button className="btn-primary" onClick={openAdd} >
+           <Plus size={16} />
+            Add Member
+          </button>
       </div>
 
       <div className="search-wrapper">
@@ -91,7 +171,8 @@ export default function Members({ data, onUpdate }) {
             <div className="divider" />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Joined {member.joinedDate} · {member.activeLoans} active loan{member.activeLoans !== 1 ? 's' : ''}
+                Joined {member.joindate} · { member.loans?.filter(loan => loan.status === "Issued").length || 0} active loan
+                { member.loans?.filter(loan => loan.status === "Issued").length !== 1 ? 's' : ''}
               </span>
               <div style={{ display: 'flex', gap: 2 }}>
                 <button className="btn-icon" onClick={() => openEdit(member)}><Pencil size={14} /></button>
@@ -106,7 +187,8 @@ export default function Members({ data, onUpdate }) {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2 className="modal-title">{editMember ? 'Edit Member' : 'Add Member'}</h2>
+            <h2 className="modal-title">{editMember ? 'Edit Member': 'Add Member'}
+            </h2>
             <div className="form-group">
               <label className="form-label">Full Name</label>
               <input className="form-input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} />
@@ -128,7 +210,7 @@ export default function Members({ data, onUpdate }) {
             </div>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn-primary" onClick={handleSave}>{editMember ? 'Save Changes' : 'Add Member'}</button>
+              <button className="btn-primary" onClick={handleSave}>{editMember? 'Save Changes': 'Add Member'}</button>
             </div>
           </div>
         </div>

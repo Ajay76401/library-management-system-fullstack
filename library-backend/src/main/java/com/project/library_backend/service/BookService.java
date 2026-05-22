@@ -84,4 +84,11 @@ public class BookService {
     public List<Book> getBooks() {
         return repo.findAll();
     }
+
+    public List<Book> availableBooks() {
+        List<Book> all = repo.findAll();
+        return all.stream().filter(book -> book.getBookCopies().stream().anyMatch(copy -> copy.getStatus()
+                .equals("Available"))).toList();
+    }
+
 }

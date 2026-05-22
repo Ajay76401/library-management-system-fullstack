@@ -1,15 +1,43 @@
 import { CircleDollarSign, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function Fines({ data, onUpdate }) {
-  const unpaid = data.fines.filter(f => !f.paid);
-  const paid = data.fines.filter(f => f.paid);
+const[fines,setFines]=useState([]);
+
+useEffect(() => {
+  fetch(`http://localhost:8080/fines`)
+    .then(res => res.json())
+    .then(fines => setFines(fines))
+    .catch(err => console.error('Error fetching fines:', err));
+}, []);
+
+  console.log('Fetched fines:', fines);
+  const unpaid = fines.filter(f => f.status !== 'Paid');
+  const paid = fines.filter(f => f.status === 'Paid');
   const outstanding = unpaid.reduce((s, f) => s + f.amount, 0);
   const collected = paid.reduce((s, f) => s + f.amount, 0);
 
-  const markPaid = (fineId) => {
-    const updated = data.fines.map(f => f.id === fineId ? { ...f, paid: true } : f);
-    onUpdate({ ...data, fines: updated });
-  };
+  const markPaid = async (fineId) => {
+  try {
+    await fetch(`http://localhost:8080/payfine/${fineId}`,{
+        method: "PUT"
+      }
+    );
+    const res = await fetch("http://localhost:8080/fines");
+    const data = await res.json();
+    setFines(data);
+  } catch(error) {
+    console.log(error);
+    alert("Failed to mark fine paid");
+  }
+};
+
+const calculateDays = (dueDate,  returnDate) => {
+  const endDate =returnDate? new Date(returnDate): new Date();
+  const due =new Date(dueDate);
+  const diff =endDate - due;
+  return Math.max(0,Math.floor(diff / (1000 * 60 * 60 * 24)));
+};
 
   return (
     <div className="page-content">
@@ -57,9 +85,9 @@ export default function Fines({ data, onUpdate }) {
                   <CircleDollarSign size={18} color="var(--gold)" />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>{fine.memberName} — {fine.bookTitle}</div>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{fine.loan.member.name} — {fine.loan.bookcopy.book.title}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                    Overdue {fine.overdueDays} days @ $1/day
+                    Overdue  {calculateDays(fine.loan.duedate,fine.loan.returndate)} days @ $1/day
                   </div>
                 </div>
                 <div style={{
@@ -100,7 +128,7 @@ export default function Fines({ data, onUpdate }) {
                   <CheckCircle2 size={16} color="var(--green-badge)" />
                 </div>
                 <div style={{ flex: 1, fontSize: 14, fontWeight: 500 }}>
-                  {fine.memberName} · Returned {fine.overdueDays} days late
+                  {fine.loan.member.name} · Returned  {calculateDays(fine.loan.duedate,  fine.loan.returndate)} days late
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>${fine.amount} paid</div>
               </div>
@@ -109,7 +137,7 @@ export default function Fines({ data, onUpdate }) {
         </>
       )}
 
-      {data.fines.length === 0 && <div className="empty-state">No fines on record.</div>}
+      {fines.length === 0 && <div className="empty-state">No fines on record.</div>}
     </div>
   );
 }

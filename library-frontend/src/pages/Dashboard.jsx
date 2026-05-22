@@ -153,7 +153,7 @@ useEffect(()=>{
             <div key={loan.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderTop: '1px solid var(--border)' }}>
               <div>
                 <div style={{ fontWeight: 500, fontSize: 14 }}>{loan.bookcopy.book.title}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{loan.member.name} · due {loan.duedate}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{loan.member?.name} · due {loan.duedate}</div>
               </div>
               <span className={`badge badge-${loan.status.toLowerCase()}`}>{loan.status}</span>
             </div>

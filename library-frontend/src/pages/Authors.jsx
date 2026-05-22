@@ -6,7 +6,23 @@ export default function Authors({ data, onUpdate }) {
   const [editAuthor, setEditAuthor] = useState(null);
   const [form, setForm] = useState({});
   const [authors, setAuthors] = useState([]);
+  const[books, setBooks] = useState([]);
   
+useEffect(() => {
+  fetchBooks();
+}, []);
+
+const fetchBooks = async () => {
+  
+ try {
+    const res = await fetch("http://localhost:8080/books")
+    const data = await res.json();
+    setBooks(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
   useEffect(() => {
    fetchAuthors();
   }, []);
@@ -73,8 +89,7 @@ export default function Authors({ data, onUpdate }) {
   }
 };
   
-  const bookCountForAuthor = (authorId) => data.books.filter(b => b.authorId === authorId).length;
-
+const bookCountForAuthor = (authorId) => books.filter(book =>book.authors?.some(author => author.id === authorId)).length;
   return (
     <div className="page-content">
       <div className="page-header">
