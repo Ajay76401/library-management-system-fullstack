@@ -7,13 +7,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class BookcopiesService {
 
-    @Autowired
-    public BookcopiesRepository repo ;
-    public Long countOfBooks(){
+    private final BookcopiesRepository repo ;
+
+    public BookcopiesService(BookcopiesRepository repo) {
+        this.repo = repo;
+    }
+
+    public long countOfBooks(){
         return repo.count();
     }
 
-    public long availablebookscount() {
+    public long availableBooksCount() {
         return repo.countByStatus("Available") ;
     }
 }

@@ -2,75 +2,85 @@ package com.project.library_backend.service;
 
 import com.project.library_backend.DTO.LoanRequest;
 import com.project.library_backend.entity.*;
+import com.project.library_backend.exception.InvalidOperationException;
+import com.project.library_backend.exception.ResourceNotFoundException;
 import com.project.library_backend.repository.*;
+import jakarta.transaction.Transactional;
 import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class LoanService {
 
-    @Autowired
-    LoanRepository repo;
+    private final LoanRepository repo;
 
-    @Autowired
-    BookcopiesRepository bookCopiesRepo;
+    private final BookcopiesRepository bookCopiesRepo;
 
-    @Autowired
-    BookRepository bookRepo;
+    private final BookRepository bookRepo;
 
-    @Autowired
-    MemberRepository memberRepo;
+    private final MemberRepository memberRepo;
 
-    @Autowired
-    FineRepository fineRepo;
+    private final FineRepository fineRepo;
+
+    public LoanService(LoanRepository repo, BookcopiesRepository bookCopiesRepo, BookRepository bookRepo, MemberRepository memberRepo, FineRepository fineRepo) {
+        this.repo = repo;
+        this.bookCopiesRepo = bookCopiesRepo;
+        this.bookRepo = bookRepo;
+        this.memberRepo = memberRepo;
+        this.fineRepo = fineRepo;
+    }
 
     public long countOfActiveLoans() {
         return repo.countByStatusIn(List.of("Issued", "Overdue"));
     }
 
-    public List<Loan> countOfOverdueLoans() {
+    public List<Loan> overdueLoans() {
         return repo.findByStatus("Overdue");
     }
 
     public List<Loan> recentLoans() {
-        List<Loan> loans = repo.findAll();
-        Collections.sort(loans, new MyComparator());
-        return loans;
+        return repo.findAll().stream().sorted((l1, l2) -> l2.getIssuedate().compareTo(l1.getIssuedate())).toList();
     }
 
+    @Transactional
     public List<Loan> getLoans() {
         updateOverdueLoans();
         return repo.findAll();
     }
-    public void returnLoan(int id) {
 
-        Loan loan = repo.findById(id).orElseThrow();
-        // set return date
+    @Transactional
+    public Loan returnLoan(int id) {
+        Loan loan = repo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Loan not found with id : " + id));
+        if (loan.getStatus().equalsIgnoreCase("Returned")) {
+            throw new InvalidOperationException("Loan already returned");
+        }
+
         loan.setReturndate(LocalDate.now());
-        // update status
         loan.setStatus("Returned");
-        // update copy status
         Bookcopies copy = loan.getBookcopy();
-
         copy.setStatus("Available");
-        repo.save(loan);
+        Loan save = repo.save(loan);
         bookCopiesRepo.save(copy);
+        return save;
     }
 
-    public void addLoan(@NonNull LoanRequest request) {
-        Member member = memberRepo.findById(request.getMemberId()).orElseThrow();
-        Book book = bookRepo.findById(request.getBookId()).orElseThrow();
+    @Transactional
+    public Loan addLoan(@NonNull LoanRequest request) {
+        Member member = memberRepo.findById(request.getMemberId()).orElseThrow(() ->
+                new ResourceNotFoundException("Member not found with id : " + request.getMemberId()));
+
+        Book book = bookRepo.findById(request.getBookId()).orElseThrow(() ->
+                new ResourceNotFoundException("Book not found with id : " + request.getBookId()));
+
         Bookcopies copy = book.getBookCopies().stream()
-                .filter(c -> c.getStatus().equals("Available"))
-                .findFirst().orElseThrow(() -> new RuntimeException("No copies available"));
+                .filter(c -> c.getStatus().equalsIgnoreCase("Available"))
+                .findFirst().orElseThrow(() -> new InvalidOperationException(
+                        "No copies available for this book"));
 
         copy.setStatus("Loaned");
         Loan loan = new Loan();
@@ -80,26 +90,27 @@ public class LoanService {
         loan.setDuedate(request.getDueDate());
         loan.setStatus("Issued");
         bookCopiesRepo.save(copy);
-        repo.save(loan);
+        return repo.save(loan);
     }
 
+    @Transactional
     public void updateOverdueLoans() {
         List<Loan> all = repo.findAll();
         for (Loan loan : all) {
-            if (!loan.getStatus().equals("Returned")) {
+            if (!loan.getStatus().equalsIgnoreCase("Returned")) {
                 if (LocalDate.now().isAfter(loan.getDuedate())) {
                     loan.setStatus("Overdue");
                     long days = ChronoUnit.DAYS.between(loan.getDuedate(), LocalDate.now());
                     double amount = days * 1;
                     Fine fine;
-                    if (loan.getFine() != null ) {
+                    if (loan.getFine() != null) {
                         fine = loan.getFine();
                     } else {
                         fine = new Fine();
                         fine.setLoan(loan);
                     }
                     fine.setAmount(amount);
-                    if(fine.getStatus() == null) {
+                    if (fine.getStatus() == null) {
                         fine.setStatus("Unpaid");
                     }
                     fineRepo.save(fine);
@@ -111,13 +122,3 @@ public class LoanService {
         }
     }
 }
-
-class MyComparator implements Comparator<Loan> {
-    @Override
-    public int compare(Loan o1, Loan o2) {
-        LocalDate date1 = o1.getIssuedate();
-        LocalDate date2 = o2.getIssuedate();
-        return date2.compareTo(date1);
-    }
-}
-

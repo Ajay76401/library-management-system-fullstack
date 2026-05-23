@@ -2,7 +2,7 @@ package com.project.library_backend.controller;
 
 import com.project.library_backend.entity.Member;
 import com.project.library_backend.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,41 +13,41 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class MemberController {
 
-    @Autowired
-    MemberService service;
+
+   private final MemberService service;
+
+    public MemberController(MemberService service) {
+        this.service = service;
+    }
 
     @GetMapping("/countofmembers")
-    public long countOfMember() {
-        return service.countOfMember();
+    public ResponseEntity<Long> countOfMember() {
+        return ResponseEntity.ok(service.countOfMember());
     }
 
     @GetMapping("/members")
-    public List<Member> getMembers() {
-        return service.getMember();
+    public ResponseEntity<List<Member>> getMembers() {
+        return ResponseEntity.ok(service.getMember());
     }
 
     @PutMapping("/updatemember/{id}")
-    public void updateMember(@PathVariable int id, @RequestBody Member member) {
-        service.updateMember(id, member);
+    public ResponseEntity<Member> updateMember(@PathVariable int id, @RequestBody Member member) {
+        return  ResponseEntity.ok(service.updateMember(id, member));
     }
 
     @DeleteMapping("/removemember/{id}")
-    public ResponseEntity<?> deleteMember(@PathVariable int id) {
-        try {
-            service.deleteMember(id);
-            return ResponseEntity.ok("Member deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Void> deleteMember(@PathVariable int id) {
+        service.deleteMember(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/addmember")
-    public void addMember(@RequestBody Member member){
-       service.addMember(member);
+    public ResponseEntity<Member> addMember(@RequestBody Member member){
+       return ResponseEntity.status(HttpStatus.CREATED).body(service.addMember(member));
     }
 
     @GetMapping("/activemembers")
-    public List<Member> activeMembers(){
-        return service.activemembers();
+    public ResponseEntity<List<Member>> activeMembers(){
+        return ResponseEntity.ok(service.activemembers());
     }
 }

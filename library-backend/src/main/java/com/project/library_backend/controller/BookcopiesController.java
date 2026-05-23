@@ -2,6 +2,8 @@ package com.project.library_backend.controller;
 
 import com.project.library_backend.service.BookcopiesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,17 +15,22 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:5173")
 public class BookcopiesController {
 
-    @Autowired
-    BookcopiesService service ;
+
+   private final BookcopiesService service ;
+
+    public BookcopiesController(BookcopiesService service) {
+        this.service = service;
+    }
+
 
     @GetMapping("/countofbooks")
-    public Long countOfBook(){
-      return service.countOfBooks();
+    public ResponseEntity<Long> countOfBook(){
+        return ResponseEntity.ok(service.countOfBooks());
     }
 
     @GetMapping("/availablebookscount")
-    public long books(){
-        return service.availablebookscount();
+    public ResponseEntity<Long> books(){
+        return ResponseEntity.ok(service.availableBooksCount());
     }
 
 

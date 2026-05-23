@@ -2,7 +2,8 @@ package com.project.library_backend.controller;
 
 import com.project.library_backend.entity.Publisher;
 import com.project.library_backend.service.PublisherService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,27 +13,32 @@ import java.util.List;
 @CrossOrigin(origins =  "http://localhost:5173")
 public class PublisherController {
 
-    @Autowired
-    private PublisherService service;
+
+    private final PublisherService service;
+
+    public PublisherController(PublisherService service) {
+        this.service = service;
+    }
 
     @PostMapping("/addpublisher")
-    public Publisher addPublisher(@RequestBody Publisher p){
-       return service.addPublisher(p);
+    public ResponseEntity<Publisher> addPublisher(@RequestBody Publisher p){
+       return ResponseEntity.status(HttpStatus.CREATED).body( service.addPublisher(p));
     }
 
     @PutMapping("/updatepublisher/{id}")
-    public Publisher updatePublisher(@PathVariable int id ,@RequestBody Publisher p){
-        return service.updatePublisher(id,p);
+    public ResponseEntity<Publisher>  updatePublisher(@PathVariable int id ,@RequestBody Publisher p){
+        return ResponseEntity.ok(service.updatePublisher(id,p));
     }
 
     @DeleteMapping("removepublisher/{id}")
-    public void removePublisher(@PathVariable int id){
+    public ResponseEntity<Void> removePublisher(@PathVariable int id){
         service.removePublisher( id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("publishers")
-    public List<Publisher> getpublisher(){
-      return service.getPublisher();
+    public ResponseEntity<List<Publisher>> getpublisher(){
+      return ResponseEntity.ok( service.getPublisher());
     }
 
 

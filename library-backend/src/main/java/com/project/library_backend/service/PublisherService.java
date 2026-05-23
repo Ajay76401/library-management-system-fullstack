@@ -1,36 +1,47 @@
-    package com.project.library_backend.service;
+package com.project.library_backend.service;
 
-    import com.project.library_backend.entity.Publisher;
-    import com.project.library_backend.repository.PublisherRepository;
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.stereotype.Service;
+import com.project.library_backend.entity.Publisher;
+import com.project.library_backend.exception.ResourceNotFoundException;
+import com.project.library_backend.repository.PublisherRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    import java.util.List;
+import java.util.List;
 
-    @Service
-    public class PublisherService {
+@Service
+public class PublisherService {
 
+    private final PublisherRepository repo;
 
-        @Autowired
-        private PublisherRepository repo;
-
-        public Publisher addPublisher(Publisher p) {
-            return repo.save(p);
-        }
-
-        public Publisher updatePublisher(int id, Publisher p){
-            Publisher publisher = repo.findById(id).orElseThrow();
-            publisher.setName(p.getName());
-            publisher.setAddress(p.getAddress());
-            publisher.setPhone(p.getPhone());
-           return  repo.save(publisher);
-        }
-
-        public void removePublisher(int id) {
-            repo.deleteById(id);
-        }
-
-        public List<Publisher> getPublisher() {
-            return repo.findAll();
-        }
+    public PublisherService(PublisherRepository repo) {
+        this.repo = repo;
     }
+
+    @Transactional
+    public Publisher addPublisher(Publisher p) {
+        return repo.save(p);
+    }
+
+    @Transactional
+    public Publisher updatePublisher(int id, Publisher p) {
+        Publisher publisher = repo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Publisher not found with id : " + id));
+        publisher.setName(p.getName());
+        publisher.setAddress(p.getAddress());
+        publisher.setPhone(p.getPhone());
+        return repo.save(publisher);
+    }
+
+    @Transactional
+    public void removePublisher(int id) {
+        Publisher publisher = repo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Publisher not found with id : " + id));
+
+        repo.delete(publisher);
+    }
+
+    public List<Publisher> getPublisher() {
+        return repo.findAll();
+    }
+}

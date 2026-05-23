@@ -3,7 +3,8 @@ package com.project.library_backend.controller;
 import com.project.library_backend.DTO.LoanRequest;
 import com.project.library_backend.entity.Loan;
 import com.project.library_backend.service.LoanService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,39 +14,41 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class LoanController {
 
-    @Autowired
-    LoanService service;
+
+   private final LoanService service;
+
+    public LoanController(LoanService service) {
+        this.service = service;
+    }
 
     @GetMapping("/activeloans")
-    public long countOfActiveLoans() {
-        return service.countOfActiveLoans();
+    public ResponseEntity<Long> countOfActiveLoans() {
+        return ResponseEntity.ok(service.countOfActiveLoans());
     }
 
     @GetMapping("/overdueloans")
-    public List<Loan> countOfOverdueLoans() {
-        return service.countOfOverdueLoans();
+    public ResponseEntity<List<Loan>> overdueLoans() {
+        return ResponseEntity.ok(service.overdueLoans());
     }
 
     @GetMapping("/recentloans")
-    public List<Loan> recentLoans() {
-        return service.recentLoans();
+    public ResponseEntity<List<Loan>> recentLoans() {
+        return ResponseEntity.ok( service.recentLoans());
     }
 
     @GetMapping("/loans")
-    public List<Loan> getLoans(){
-        return service.getLoans();
+    public ResponseEntity<List<Loan>> getLoans(){
+        return ResponseEntity.ok(service.getLoans());
     }
 
     @PutMapping("/returnloan/{id}")
-    public void returnLoan(@PathVariable int id){
-        service.returnLoan(id);
+    public ResponseEntity<Loan> returnLoan(@PathVariable int id){
+        return  ResponseEntity.ok(service.returnLoan(id));
     }
 
     @PostMapping("/addloan")
-    public void addLoan(
-            @RequestBody LoanRequest request
-    ){
-        service.addLoan(request);
+    public ResponseEntity<Loan> addLoan(@RequestBody LoanRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.addLoan(request));
     }
 
 }
