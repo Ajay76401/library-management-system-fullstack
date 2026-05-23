@@ -1,40 +1,45 @@
 package com.project.library_backend.service;
 
 import com.project.library_backend.entity.Author;
+import com.project.library_backend.exception.ResourceNotFoundException;
 import com.project.library_backend.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AuthorService {
 
-    @Autowired
-    AuthorRepository repo;
+
+   private final AuthorRepository repo;
+
+   public AuthorService(AuthorRepository repo){
+       this.repo=repo;
+   }
 
     public long countOfAuthors() {
         return repo.count();
     }
 
-    public void addAuthor(Author author) {
-        repo.save(author);
+    public Author addAuthor(Author author) {
+        return repo.save(author);
     }
 
-    public void updateAuthor(int id ,Author author) {
-        Author author1 = repo.findById(id).orElseThrow();
+    public Author updateAuthor(int id, Author author) {
+        Author author1 = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Author not found with id : " + id));
         author1.setName(author.getName());
         author1.setNationality(author.getNationality());
         author1.setBio(author.getBio());
-        repo.save(author1);
+        return repo.save(author1);
     }
 
     public void deleteAuthor(int id) {
-        repo.deleteById(id);
+        Author author = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Author not found with id : " + id));
+        repo.delete(author);
     }
 
     public List<Author> getAuthors() {
-        return repo.findAll() ;
+        return repo.findAll();
     }
 }

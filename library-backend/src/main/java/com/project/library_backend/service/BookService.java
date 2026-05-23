@@ -5,36 +5,41 @@ import com.project.library_backend.entity.Author;
 import com.project.library_backend.entity.Book;
 import com.project.library_backend.entity.Bookcopies;
 import com.project.library_backend.entity.Publisher;
+import com.project.library_backend.exception.InvalidOperationException;
+import com.project.library_backend.exception.ResourceNotFoundException;
 import com.project.library_backend.repository.AuthorRepository;
 import com.project.library_backend.repository.BookRepository;
 import com.project.library_backend.repository.BookcopiesRepository;
 import com.project.library_backend.repository.PublisherRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookService {
 
-    @Autowired
-    BookRepository repo;
+    private final BookRepository repo;
 
-    @Autowired
-    AuthorRepository authorRepo;
+    private final AuthorRepository authorRepo;
 
-    @Autowired
-    PublisherRepository publisherRepo;
+    private final PublisherRepository publisherRepo;
 
-    @Autowired
-    BookcopiesRepository bookCopiesRepo;
+    private final BookcopiesRepository bookCopiesRepo;
 
-    public void addBook(BookRequest request) {
-        Author author = authorRepo.findById(request.getAuthorId()).orElseThrow();
-        author.setBookCount(author.getBookCount() + 1);
-        Publisher publisher = publisherRepo.findById(request.getPublisherId()).orElseThrow();
+    public BookService(BookRepository repo, AuthorRepository authorRepo, PublisherRepository publisherRepo, BookcopiesRepository bookCopiesRepo) {
+        this.repo = repo;
+        this.authorRepo = authorRepo;
+        this.publisherRepo = publisherRepo;
+        this.bookCopiesRepo = bookCopiesRepo;
+    }
+    @Transactional
+    public Book addBook(BookRequest request) {
+        Author author = authorRepo.findById(request.getAuthorId()).orElseThrow(()->
+                new ResourceNotFoundException(("Author not found with id : " + request.getAuthorId())));
+        Publisher publisher = publisherRepo.findById(request.getPublisherId()).orElseThrow(()->
+                new ResourceNotFoundException(("Publisher not found with id : " + request.getPublisherId())));
         Book book = new Book();
         book.setTitle(request.getTitle());
         book.setYop(request.getYop());
@@ -53,32 +58,38 @@ public class BookService {
             copies.add(copy);
         }
         bookCopiesRepo.saveAll(copies);
-    }
 
+        return savedBook;
+    }
+    @Transactional
     public void deleteBook(int id) {
-        Book book = repo.findById(id).orElseThrow();
+        Book book = repo.findById(id).orElseThrow(()->new ResourceNotFoundException(("Book not found with id : " + id)));
         boolean hasLoanedCopies = book.getBookCopies().stream().anyMatch(copy -> copy.getStatus().equalsIgnoreCase("Loaned"));
         if (hasLoanedCopies) {
-            throw new IllegalStateException(
+            throw new InvalidOperationException(
                     "Cannot delete book. Some copies are currently loaned."
             );
         }
         bookCopiesRepo.deleteAll(book.getBookCopies());
         repo.delete(book);
     }
-
-    public void updateBook(int id, BookRequest bookRequest) {
-        Book book1 = repo.findById(id).orElseThrow();
+    @Transactional
+    public Book updateBook(int id, BookRequest bookRequest) {
+        Book book1 = repo.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(("Book not found with id : " + id)));
         book1.setTitle(bookRequest.getTitle());
         book1.setYop(bookRequest.getYop());
         book1.setIsbn(bookRequest.getIsbn());
         book1.setCategory(bookRequest.getCategory());
 
-        Author author = authorRepo.findById(bookRequest.getAuthorId()).orElseThrow();
-        Publisher publisher = publisherRepo.findById(bookRequest.getPublisherId()).orElseThrow();
+        Author author = authorRepo.findById(bookRequest.getAuthorId()).orElseThrow(()->
+                new ResourceNotFoundException(("Author not found with id : " + bookRequest.getAuthorId())));
+
+        Publisher publisher = publisherRepo.findById(bookRequest.getPublisherId()).orElseThrow(()->
+                new ResourceNotFoundException(("Publisher not found with id : " + bookRequest.getPublisherId())));
         book1.setPublisher(publisher);
         book1.setAuthors(new ArrayList<>(List.of(author)));
-        repo.save(book1);
+        return repo.save(book1);
     }
 
     public List<Book> getBooks() {
@@ -88,7 +99,7 @@ public class BookService {
     public List<Book> availableBooks() {
         List<Book> all = repo.findAll();
         return all.stream().filter(book -> book.getBookCopies().stream().anyMatch(copy -> copy.getStatus()
-                .equals("Available"))).toList();
+                .equalsIgnoreCase("Available"))).toList();
     }
 
 }
