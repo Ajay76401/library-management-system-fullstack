@@ -511,3 +511,25 @@ input {
   color: var(--text-muted);
   font-size: 14px;
 }
+.logout-btn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  padding:10px 16px;
+
+  border:none;
+  border-radius:8px;
+
+  background:#b91c1c;
+  color:white;
+
+  cursor:pointer;
+
+  font-size:14px;
+  font-weight:500;
+}
+
+.logout-btn:hover{
+  opacity:0.9;
+}

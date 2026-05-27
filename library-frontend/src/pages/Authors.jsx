@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, PenTool } from 'lucide-react';
+import { apiFetch } from '../api/api'
 
 export default function Authors({ data, onUpdate }) {
   const [showModal, setShowModal] = useState(false);
@@ -15,7 +16,7 @@ useEffect(() => {
 const fetchBooks = async () => {
   
  try {
-    const res = await fetch("http://localhost:8080/books")
+    const res = await apiFetch("/books")
     const data = await res.json();
     setBooks(data);
   } catch (error) {
@@ -29,7 +30,7 @@ const fetchBooks = async () => {
 
   const fetchAuthors = async () => {
   try {
-    const response = await fetch("http://localhost:8080/authors");
+    const response = await apiFetch("/authors");
     const data = await response.json();
     setAuthors(data);
   } catch (error) {
@@ -57,17 +58,13 @@ const fetchBooks = async () => {
      
     try{
       if (editAuthor) {
-      await  fetch(`http://localhost:8080/updateauthor/${editAuthor.id}`,{
+      await  apiFetch(`/updateauthor/${editAuthor.id}`,{
         method:"PUT",
-        headers:{
-        "Content-Type":"application/json"
-        },
         body: JSON.stringify(form)
      })
     } else {
-     await fetch("http://localhost:8080/addauthor" ,{
+     await fetch("/addauthor" ,{
       method :"POST",
-      headers: { "Content-Type" : "application/json"},
        body: JSON.stringify(form)
      });
     }
@@ -83,7 +80,7 @@ const fetchBooks = async () => {
 
   if (confirm('Delete this author?')) {
     try {
-      await fetch(`http://localhost:8080/removeauthor/${id}`, {
+      await apiFetch(`/removeauthor/${id}`, {
         method: 'DELETE'
       });
       fetchAuthors();

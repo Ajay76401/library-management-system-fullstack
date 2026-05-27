@@ -1,5 +1,6 @@
 import { useState ,useEffect } from 'react';
 import { Search, Plus, Pencil, Trash2, BookOpen } from 'lucide-react';
+import { apiFetch } from '../api/api'
 
 export default function Books({ data, onUpdate }) {
   const [search, setSearch] = useState('');
@@ -11,14 +12,14 @@ export default function Books({ data, onUpdate }) {
   const [publishers,setPublishers] = useState([]);
 
   useEffect(() => {
-   fetch(`http://localhost:8080/authors`)
+   apiFetch(`/authors`)
     .then(res => res.json())
     .then(data => setAuthors(data))
     .catch(error => console.log(error));
   }, []);     
 
   useEffect(() => {
-    fetch(`http://localhost:8080/publishers`)
+    apiFetch(`/publishers`)
      .then(res => res.json())
      .then(data => setPublishers(data))
      .catch(error => console.log(error));
@@ -31,7 +32,7 @@ useEffect(() => {
 const fetchBooks = async () => {
   
  try {
-    const res = await fetch("http://localhost:8080/books")
+    const res = await apiFetch("/books")
     const data = await res.json();
     setBooks(data);
   } catch (error) {
@@ -100,22 +101,16 @@ const fetchBooks = async () => {
         console.log(bookData);
         // UPDATE BOOK
         if (editBook) {
-          await fetch(`http://localhost:8080/updatebook/${editBook.id}`, {
+          await apiFetch(`/updatebook/${editBook.id}`, {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json"
-            },
             body: JSON.stringify(bookData)
           });
         }
         // ADD BOOK
         else {
             bookData.totalCopies = Number(form.totalCopies);
-            await fetch("http://localhost:8080/addbook", {
+            await apiFetch("/addbook", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
             body: JSON.stringify(bookData)
           });
 

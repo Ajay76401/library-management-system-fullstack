@@ -1,29 +1,31 @@
 import { CircleDollarSign, CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../api/api'
 
 export default function Fines({ data, onUpdate }) {
 const[fines,setFines]=useState([]);
 
 useEffect(() => {
-  fetch(`http://localhost:8080/fines`)
+  apiFetch(`/fines`)
     .then(res => res.json())
     .then(fines => setFines(fines))
     .catch(err => console.error('Error fetching fines:', err));
 }, []);
 
-  console.log('Fetched fines:', fines);
+ 
   const unpaid = fines.filter(f => f.status !== 'Paid');
   const paid = fines.filter(f => f.status === 'Paid');
   const outstanding = unpaid.reduce((s, f) => s + f.amount, 0);
   const collected = paid.reduce((s, f) => s + f.amount, 0);
 
+
   const markPaid = async (fineId) => {
   try {
-    await fetch(`http://localhost:8080/payfine/${fineId}`,{
+    await apiFetch(`/payfine/${fineId}`,{
         method: "PUT"
       }
     );
-    const res = await fetch("http://localhost:8080/fines");
+    const res = await apiFetch("/fines");
     const data = await res.json();
     setFines(data);
   } catch(error) {

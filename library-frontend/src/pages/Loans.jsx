@@ -1,5 +1,6 @@
   import { useEffect, useState } from 'react';
   import { Plus, Calendar, BookMarked, RotateCcw } from 'lucide-react';
+import { apiFetch } from '../api/api'
 
   export default function Loans({ data, onUpdate }) {
     const [tab, setTab] = useState('active');
@@ -11,21 +12,21 @@
     const [search, setSearch] = useState('');
 
     useEffect(() => {
-      fetch(`http://localhost:8080/availablebooks`)
+      apiFetch(`/availablebooks`)
       .then(res => res.json())
       .then(books => setAvailableBooks(books))
       .catch(err => console.error('Error fetching available books:', err));
     }, []);
 
     useEffect(() => {
-      fetch(`http://localhost:8080/activemembers`)
+      apiFetch(`/activemembers`)
       .then(res => res.json())
       .then(members => setActiveMembers(members))
       .catch(err => console.error('Error fetching active members:', err));
     }, []);
 
     useEffect(() => {
-      fetch(`http://localhost:8080/loans`)
+      apiFetch(`/loans`)
       .then(res => res.json())
       .then(loans =>setLoans(loans))
       .catch(err => console.error('Error fetching loans:', err));
@@ -37,8 +38,8 @@
 
     const handleReturn = async (loanId) => {
     try {
-      await fetch(`http://localhost:8080/returnloan/${loanId}`,{method: "PUT"});
-      const res = await fetch("http://localhost:8080/loans");
+      await apiFetch(`/returnloan/${loanId}`,{method: "PUT"});
+      const res = await apiFetch("/loans");
       const data = await res.json();
       setLoans(data);
     } catch(error) {
@@ -65,8 +66,8 @@
     }
   
     try {
-      await fetch(
-        "http://localhost:8080/addloan",{
+      await apiFetch(
+        "/addloan",{
           method: "POST",
           headers: {"Content-Type":"application/json"},
           body: JSON.stringify({
@@ -77,7 +78,7 @@
           })
         }
       );
-     const res = await fetch("http://localhost:8080/loans");
+     const res = await apiFetch("/loans");
       const updatedLoans = await res.json();
       setLoans(updatedLoans);
       setShowModal(false);

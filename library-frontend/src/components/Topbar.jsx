@@ -1,4 +1,6 @@
-import { PanelLeft } from 'lucide-react';
+import axios from 'axios';
+import { PanelLeft, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PAGE_LABELS = {
   dashboard: 'Dashboard',
@@ -11,6 +13,22 @@ const PAGE_LABELS = {
 };
 
 export default function Topbar({ currentPage }) {
+    const navigate = useNavigate()
+    const handleLogout = async () => {
+    try {
+      await axios.post(
+        'http://localhost:8080/logout',
+        {},
+        {
+          withCredentials: true
+        }
+      )
+      navigate('/login')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <div className="topbar">
       <div className="topbar-breadcrumb">
@@ -19,10 +37,15 @@ export default function Topbar({ currentPage }) {
         <span>/</span>
         <span className="current">{PAGE_LABELS[currentPage]}</span>
       </div>
-      <div className="system-status">
-        <div className="status-dot" />
-        System online
-      </div>
+
+      <button
+        onClick={handleLogout}
+        className="logout-btn"
+      >
+        <LogOut size={16} />
+        Logout
+      </button>
+      
     </div>
   );
 }

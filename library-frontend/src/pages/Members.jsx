@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Search,   Plus,Pencil, Trash2, Mail, Phone } from 'lucide-react';
+import { apiFetch } from '../api/api'
+
 
 export default function Members({ data, onUpdate }) {
   const [search, setSearch] = useState('');
@@ -9,7 +11,7 @@ export default function Members({ data, onUpdate }) {
   const[members, setMembers] = useState([]);
 
   useEffect(() => {
-      fetch(`http://localhost:8080/members`)
+      apiFetch(`/members`)
       .then(res => res.json())
       .then(data => setMembers(data))
       .catch(err => console.error('Error fetching members:', err));
@@ -61,11 +63,8 @@ if (!emailRegex.test(form.email)) {
   return;
 }
     if (editMember) {
-      await fetch(`http://localhost:8080/updatemember/${editMember.id}`, {
+      await apiFetch(`/updatemember/${editMember.id}`, {
         method:"PUT",
-        headers:{
-          "Content-Type":"application/json"
-        },
         body: JSON.stringify({
           name: form.name,
           email: form.email,
@@ -76,16 +75,10 @@ if (!emailRegex.test(form.email)) {
    
     } else {
 
-      await fetch(
-        "http://localhost:8080/addmember",
+      await apiFetch(
+        "/addmember",
         {
           method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
           body: JSON.stringify({
             name: form.name,
             email: form.email,
@@ -101,8 +94,8 @@ if (!emailRegex.test(form.email)) {
     }
 
     // refresh
-    const res = await fetch(
-      "http://localhost:8080/members"
+    const res = await apiFetch(
+      "/members"
     );
     const data = await res.json();
     setMembers(data);
@@ -112,11 +105,9 @@ if (!emailRegex.test(form.email)) {
   const handleDelete = async (id) => {
   if (confirm('Delete this member?')) {
     try {
-      const response = await fetch(
-        `http://localhost:8080/removemember/${id}`,
-        {
-          method: "DELETE"
-        }
+      const response = await apiFetch(
+        `/removemember/${id}`,
+        { method: "DELETE"}
       );
       if (!response.ok) {
         const message =

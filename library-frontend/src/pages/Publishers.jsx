@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, Building2 } from 'lucide-react';
+import { apiFetch } from '../api/api'
+
 
 export default function Publishers({ data, onUpdate }) {
   const [showModal, setShowModal] = useState(false);
@@ -15,7 +17,7 @@ useEffect(() => {
 const fetchBooks = async () => {
   
  try {
-    const res = await fetch("http://localhost:8080/books")
+    const res = await apiFetch("/books")
     const data = await res.json();
     setBooks(data);
   } catch (error) {
@@ -25,7 +27,7 @@ const fetchBooks = async () => {
 
 
   useEffect(()=>{
-    fetch("http://localhost:8080/publishers")
+    apiFetch("/publishers")
     .then(res => res.json())
     .then(data => setPublishers(data))
     .catch(err => console.log(err))
@@ -54,9 +56,8 @@ const fetchBooks = async () => {
     }
     if (editPublisher) {
         
-      fetch(`http://localhost:8080/updatepublisher/${editPublisher.id}`,{
+      apiFetch(`/updatepublisher/${editPublisher.id}`,{
         method:"PUT",
-        headers:{"Content-Type":"application/json"},
         body:JSON.stringify(form)
       })
        .then(res => res.json())
@@ -71,9 +72,8 @@ const fetchBooks = async () => {
         })
       .catch(err => console.log(err));
     } else {
-       fetch("http://localhost:8080/addpublisher",{
+       apiFetch("/addpublisher",{
          method:"POST" ,
-         headers:{"Content-Type":"application/json"},
           body:JSON.stringify(form)
        })
        .then(res => res.json())
@@ -91,9 +91,8 @@ const fetchBooks = async () => {
     if (confirm('Delete this publisher?')) {
       // onUpdate({ ...data, publishers: data.publishers.filter(p => p.id !== id) });
 
-      fetch(`http://localhost:8080/removepublisher/${id}`,{
+      apiFetch(`/removepublisher/${id}`,{
         method : "DELETE",
-        headers : {"Content-Type":"application/json"}
       })
        .then(res => res.text())
     .then(() => {

@@ -1,5 +1,6 @@
 import { AlertTriangle, ArrowRight, BookMarked, BookOpen, Receipt, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../api/api'
 
 export default function Dashboard({ data, onNavigate }) {
  const [totalBooks, setTotalBooks] = useState(0);
@@ -12,55 +13,55 @@ export default function Dashboard({ data, onNavigate }) {
  const [recentLoans ,setRecentLoans] = useState([]);
 
  useEffect(()=>{
-    fetch("http://localhost:8080/recentloans")
+    apiFetch("/recentloans")
     .then(res => res.json())
     .then(data => setRecentLoans(data))
     .catch(err => console.log(err))
  },[])
 
 useEffect(()=>{
-  fetch("http://localhost:8080/fines")
+  apiFetch ("/fines")
   .then(res => res.json())
   .then(data =>setFines(data))
   .catch(err => console.log(err))
 },[])
  useEffect(()=>{
-     fetch("http://localhost:8080/activeloans")
+     apiFetch ("/activeloans")
      .then(res => res.json())
      .then(count => setActiveLoans(count))
      .catch(err => console.log(err))
  },[])
 
  useEffect(()=>{
-     fetch('http://localhost:8080/countofauthors')
+     apiFetch ('/countofauthors')
      .then(res => res.json())
      .then(count => setTotalAuthors(count))
      .catch(err => console.log(err));
  },[])
 
   useEffect(() => {
-    fetch('http://localhost:8080/countofbooks')
+    apiFetch ('/countofbooks')
       .then(res => res.json())
       .then(count => {setTotalBooks(count)})
       .catch(err => console.log(err));
   }, []);
 
   useEffect(()=>{
-       fetch("http://localhost:8080/countofmembers")
+       apiFetch ("/countofmembers")
        .then(res => res.json())
        .then(count => {setTotalMembers(count)})
        .catch(err => console.log(err));
   },[])
 
   useEffect(()=>{
-    fetch("http://localhost:8080/availablebookscount")
+    apiFetch ("/availablebookscount")
     .then(res => res.json())
     .then(count =>{ setavAilableBooks(count)})
     .catch(err => console.log(err));
   },[])
 
    useEffect(()=>{
-    fetch("http://localhost:8080/overdueloans")
+    apiFetch ("/overdueloans")
     .then(res => res.json())
     .then(data => setOverdueLoans(data))
     .catch(err => console.log(err))
