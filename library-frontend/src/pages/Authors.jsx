@@ -50,7 +50,11 @@ const fetchBooks = async () => {
   };
 
   const handleSave = async() => {
-    if (!form.name) return;
+    if (!form.name || !form.nationality || !form.bio) {
+        alert("Please fill all fields");
+       return;
+    }
+     
     try{
       if (editAuthor) {
       await  fetch(`http://localhost:8080/updateauthor/${editAuthor.id}`,{
@@ -149,7 +153,10 @@ const bookCountForAuthor = (authorId) => books.filter(book =>book.authors?.some(
             </div>
             <div className="form-group">
               <label className="form-label">Nationality</label>
-              <input className="form-input" value={form.nationality || ''} onChange={e => setForm({ ...form, nationality: e.target.value })} />
+              <input 
+              className="form-input"
+              required
+               value={form.nationality || ''} onChange={e => setForm({ ...form, nationality: e.target.value })} />
             </div>
             <div className="form-group">
               <label className="form-label">Bio / Description</label>

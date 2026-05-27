@@ -44,7 +44,14 @@ const fetchBooks = async () => {
   };
 
   const handleSave = () => {
-    if (!form.name) return;
+    if (!form.name ||!form.phone || !form.address) {
+      alert("Please Fill all the fields");
+      return;
+   }
+    if (!/^\d{10}$/.test(form.phone)) {
+      alert("Phone number must be exactly 10 digits");
+      return;
+    }
     if (editPublisher) {
         
       fetch(`http://localhost:8080/updatepublisher/${editPublisher.id}`,{
@@ -157,7 +164,20 @@ const fetchBooks = async () => {
             </div>
             <div className="form-group">
               <label className="form-label">Phone</label>
-              <input className="form-input" type="tel " value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} />
+              <input
+                  className="form-input"
+                  type="tel"
+                  required
+                  maxLength="10"
+                  value={form.phone || ''}
+                  onChange={e => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value) && value.length <= 10) {
+                      setForm({ ...form, phone: value });
+                    }
+                  }}
+                  placeholder="Enter 10-digit phone number"
+                />
             </div>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>

@@ -72,11 +72,19 @@ const fetchBooks = async () => {
         !form.title ||
         !form.authorId ||
         !form.publisherId ||
-        !form.year
-      ) {
+        !form.year  ||
+        !form.category
+      ){
         alert("Please fill all fields");
         return;
       }
+
+    const currentYear = new Date().getFullYear();
+
+    if (form.year < 1900 || form.year > currentYear) {
+      alert(`Year must be between 1900 and ${currentYear}`);
+      return;
+    }  
 
       try {
         const bookData = {
@@ -235,10 +243,21 @@ const fetchBooks = async () => {
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div className="form-group">
-                <label className="form-label">Year</label>
-                <input className="form-input" type="number" value={form.year || ''} onChange={e => setForm({ ...form, year: e.target.value })} />
-              </div>
+             <div className="form-group">
+              <label className="form-label">Year</label>
+
+              <input
+                className="form-input"
+                type="number"
+                min="1900"
+                max={new Date().getFullYear()}
+                required
+                value={form.year || ''}
+                onChange={e =>
+                  setForm({ ...form, year: e.target.value })
+                }
+              />
+            </div>
               {!editBook && (
               <div className="form-group">
                 <label className="form-label">Copies</label>

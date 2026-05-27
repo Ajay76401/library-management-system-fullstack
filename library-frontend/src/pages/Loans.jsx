@@ -50,7 +50,7 @@
   const openIssue = () => {
       const today = new Date().toISOString().slice(0, 10);
       const due = new Date();
-      due.setDate(due.getDate() + 14);
+      due.setDate(due.getDate() + 30);
       setForm({ bookId: '', memberId: '', issuedDate: today, dueDate: due.toISOString().slice(0, 10) });
       setShowModal(true);
     };
@@ -59,7 +59,11 @@
     if (!form.bookId || !form.memberId) {
       alert("Please select book and member");
       return;
+    }  if (new Date(form.dueDate) < new Date(form.issuedDate)) {
+       alert("Due date cannot be before issue date");
+     return;
     }
+  
     try {
       await fetch(
         "http://localhost:8080/addloan",{
@@ -189,7 +193,13 @@
                 </div>
                 <div className="form-group">
                   <label className="form-label">Due Date</label>
-                  <input className="form-input" type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} />
+                 <input
+                  className="form-input"
+                  type="date"
+                  min={form.issuedDate}
+                  value={form.dueDate}
+                  onChange={e => setForm({ ...form, dueDate: e.target.value })}
+                  />
                 </div>
               </div>
               <div className="modal-actions">

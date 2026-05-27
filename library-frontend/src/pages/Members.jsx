@@ -46,7 +46,18 @@ export default function Members({ data, onUpdate }) {
   !form.email ||
   !form.phone
    ) {
-  alert("Please fill all fields");
+      alert("Please fill all fields");
+      return;
+    }
+    if (!/^\d{10}$/.test(form.phone)) {
+      alert("Phone number must be exactly 10 digits");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailRegex.test(form.email)) {
+  alert("Please enter a valid email address");
   return;
 }
     if (editMember) {
@@ -195,11 +206,32 @@ export default function Members({ data, onUpdate }) {
             </div>
             <div className="form-group">
               <label className="form-label">Email</label>
-              <input className="form-input" type="email" value={form.email || ''} onChange={e => setForm({ ...form, email: e.target.value })} />
+
+              <input
+                className="form-input"
+                type="email"
+                required
+                value={form.email || ''}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                placeholder="Enter email"
+              />
             </div>
             <div className="form-group">
               <label className="form-label">Phone</label>
-              <input className="form-input" value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} />
+              <input
+                  className="form-input"
+                  type="tel"
+                  required
+                  maxLength="10"
+                  value={form.phone || ''}
+                  onChange={e => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value) && value.length <= 10) {
+                      setForm({ ...form, phone: value });
+                    }
+                  }}
+                  placeholder="Enter 10-digit phone number"
+                />
             </div>
             <div className="form-group">
               <label className="form-label">Status</label>
