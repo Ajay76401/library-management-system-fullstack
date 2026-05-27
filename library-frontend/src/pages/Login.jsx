@@ -76,16 +76,16 @@ const Login = () => {
 
           <div style={styles.statsRow}>
             <div style={styles.statBox}>
-              <span style={styles.statNum}>2,400+</span>
-              <span style={styles.statLabel}>Books</span>
+              <span style={styles.statNum}>Smart book  </span>
+              <span style={styles.statLabel}> management</span>
             </div>
             <div style={styles.statBox}>
-              <span style={styles.statNum}>840</span>
-              <span style={styles.statLabel}>Members</span>
+              <span style={styles.statNum}>Automated  </span>
+              <span style={styles.statLabel}>fine tracking</span>
             </div>
             <div style={styles.statBox}>
-              <span style={styles.statNum}>320</span>
-              <span style={styles.statLabel}>Active Loans</span>
+              <span style={styles.statNum}> librarian </span>
+              <span style={styles.statLabel}>access</span>
             </div>
           </div>
 
@@ -258,16 +258,16 @@ const styles = {
   },
   statsRow: {
     display: 'flex',
-    gap: 24,
+    gap: 40,
   },
   statBox: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 2,
+    gap : 6,
   },
   statNum: {
     fontFamily: "'Playfair Display', serif",
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 700,
     color: 'var(--gold-light)',
   },
