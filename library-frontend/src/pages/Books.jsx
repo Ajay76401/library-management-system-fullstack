@@ -13,14 +13,12 @@ export default function Books({ data, onUpdate }) {
 
   useEffect(() => {
    apiFetch(`/authors`)
-    .then(res => res.json())
     .then(data => setAuthors(data))
     .catch(error => console.log(error));
   }, []);     
 
   useEffect(() => {
     apiFetch(`/publishers`)
-     .then(res => res.json())
      .then(data => setPublishers(data))
      .catch(error => console.log(error));
   }, []);
@@ -33,8 +31,7 @@ const fetchBooks = async () => {
   
  try {
     const res = await apiFetch("/books")
-    const data = await res.json();
-    setBooks(data);
+    setBooks(res);
   } catch (error) {
     console.log(error);
   }
@@ -127,26 +124,14 @@ const fetchBooks = async () => {
  const handleDelete = async (id) => {
   if (confirm('Delete this book?')) {
     try {
-      const response = await fetch(
-        `http://localhost:8080/removebook/${id}`,
-        {
-          method: "DELETE"
-        });
-
-      if (!response.ok) {
-        const message = await response.text();
-        console.log(message);
-        alert(message);
-        return;
-      }
-      await fetchBooks();
-
-    }catch (error) {
-      console.log(error);
-      alert("Something went wrong");
+      await apiFetch( `/removebook/${id}`, { method: "DELETE" })
+      await fetchBooks()
+    } catch (error) {
+      console.log(error)
+      alert("Something went wrong")
     }
   }
-};
+}
 
   return (
     <div className="page-content">

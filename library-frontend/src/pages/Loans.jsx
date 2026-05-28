@@ -62,8 +62,7 @@ import { apiFetch } from '../api/api'
     }
   
     try {
-      await apiFetch(
-        "/addloan",{
+      await apiFetch("/addloan",{
           method: "POST",
           headers: {"Content-Type":"application/json"},
           body: JSON.stringify({
