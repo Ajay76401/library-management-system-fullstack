@@ -73,7 +73,6 @@ const fetchBooks = async () => {
          method:"POST" ,
           body:JSON.stringify(form)
        })
-       .then(res => res.json())
         .then(newPublisher => {
            setPublishers([...publishers, newPublisher]);
            alert("Publisher added successfully!");
@@ -91,7 +90,6 @@ const fetchBooks = async () => {
       apiFetch(`/removepublisher/${id}`,{
         method : "DELETE",
       })
-       .then(res => res.text())
     .then(() => {
        setPublishers(publishers.filter(p => p.id !== id));
     })
