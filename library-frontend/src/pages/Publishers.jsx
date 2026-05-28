@@ -18,8 +18,7 @@ const fetchBooks = async () => {
   
  try {
     const res = await apiFetch("/books")
-    const data = await res.json();
-    setBooks(data);
+    setBooks(res);
   } catch (error) {
     console.log(error);
   }
@@ -28,7 +27,6 @@ const fetchBooks = async () => {
 
   useEffect(()=>{
     apiFetch("/publishers")
-    .then(res => res.json())
     .then(data => setPublishers(data))
     .catch(err => console.log(err))
   },[])
@@ -60,7 +58,6 @@ const fetchBooks = async () => {
         method:"PUT",
         body:JSON.stringify(form)
       })
-       .then(res => res.json())
        .then(updatedPublisher => {
           setPublishers(
             publishers.map(p =>

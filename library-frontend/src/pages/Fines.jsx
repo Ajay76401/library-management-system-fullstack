@@ -7,7 +7,6 @@ const[fines,setFines]=useState([]);
 
 useEffect(() => {
   apiFetch(`/fines`)
-    .then(res => res.json())
     .then(fines => setFines(fines))
     .catch(err => console.error('Error fetching fines:', err));
 }, []);
@@ -26,8 +25,7 @@ useEffect(() => {
       }
     );
     const res = await apiFetch("/fines");
-    const data = await res.json();
-    setFines(data);
+    setFines(res);
   } catch(error) {
     console.log(error);
     alert("Failed to mark fine paid");

@@ -12,7 +12,6 @@ export default function Members({ data, onUpdate }) {
 
   useEffect(() => {
       apiFetch(`/members`)
-      .then(res => res.json())
       .then(data => setMembers(data))
       .catch(err => console.error('Error fetching members:', err));
   }, []);
@@ -97,8 +96,7 @@ if (!emailRegex.test(form.email)) {
     const res = await apiFetch(
       "/members"
     );
-    const data = await res.json();
-    setMembers(data);
+    setMembers(res);
     setShowModal(false);
   };
 

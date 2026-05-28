@@ -13,21 +13,18 @@ import { apiFetch } from '../api/api'
 
     useEffect(() => {
       apiFetch(`/availablebooks`)
-      .then(res => res.json())
       .then(books => setAvailableBooks(books))
       .catch(err => console.error('Error fetching available books:', err));
     }, []);
 
     useEffect(() => {
       apiFetch(`/activemembers`)
-      .then(res => res.json())
       .then(members => setActiveMembers(members))
       .catch(err => console.error('Error fetching active members:', err));
     }, []);
 
     useEffect(() => {
       apiFetch(`/loans`)
-      .then(res => res.json())
       .then(loans =>setLoans(loans))
       .catch(err => console.error('Error fetching loans:', err));
     }, []);
@@ -40,8 +37,7 @@ import { apiFetch } from '../api/api'
     try {
       await apiFetch(`/returnloan/${loanId}`,{method: "PUT"});
       const res = await apiFetch("/loans");
-      const data = await res.json();
-      setLoans(data);
+      setLoans(res);
     } catch(error) {
       console.log(error);
       alert("Failed to return book");
