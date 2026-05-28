@@ -1,5 +1,6 @@
 package com.project.library_backend.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,6 +40,17 @@ public class SecurityConfig {
                         .failureHandler((request, response, exception) -> {
                             response.setStatus(401);
                         })
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(
+                                (request, response, authException) -> {
+
+                                    response.sendError(
+                                            HttpServletResponse.SC_UNAUTHORIZED,
+                                            authException.getMessage()
+                                    );
+                                }
+                        )
                 );
 
         return http.build();

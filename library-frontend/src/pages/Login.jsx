@@ -42,7 +42,9 @@ const Login = () => {
           }
         }
       )
-      navigate('/')
+      if (res.status === 200) {
+          navigate('/')
+       }
 
     } catch (err) {
       setError('Invalid email or password. Please try again.')

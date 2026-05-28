@@ -14,55 +14,47 @@ export default function Dashboard({ data, onNavigate }) {
 
  useEffect(()=>{
     apiFetch("/recentloans")
-    .then(res => res.json())
     .then(data => setRecentLoans(data))
     .catch(err => console.log(err))
  },[])
 
 useEffect(()=>{
   apiFetch ("/fines")
-  .then(res => res.json())
   .then(data =>setFines(data))
   .catch(err => console.log(err))
 },[])
  useEffect(()=>{
      apiFetch ("/activeloans")
-     .then(res => res.json())
      .then(count => setActiveLoans(count))
      .catch(err => console.log(err))
  },[])
 
  useEffect(()=>{
      apiFetch ('/countofauthors')
-     .then(res => res.json())
      .then(count => setTotalAuthors(count))
      .catch(err => console.log(err));
  },[])
 
   useEffect(() => {
     apiFetch ('/countofbooks')
-      .then(res => res.json())
       .then(count => {setTotalBooks(count)})
       .catch(err => console.log(err));
   }, []);
 
   useEffect(()=>{
        apiFetch ("/countofmembers")
-       .then(res => res.json())
        .then(count => {setTotalMembers(count)})
        .catch(err => console.log(err));
   },[])
 
   useEffect(()=>{
     apiFetch ("/availablebookscount")
-    .then(res => res.json())
     .then(count =>{ setavAilableBooks(count)})
     .catch(err => console.log(err));
   },[])
 
    useEffect(()=>{
     apiFetch ("/overdueloans")
-    .then(res => res.json())
     .then(data => setOverdueLoans(data))
     .catch(err => console.log(err))
  },[])
