@@ -63,7 +63,7 @@ const fetchBooks = async () => {
         body: JSON.stringify(form)
      })
     } else {
-     await fetch("/addauthor" ,{
+     await apiFetch("/addauthor" ,{
       method :"POST",
        body: JSON.stringify(form)
      });
