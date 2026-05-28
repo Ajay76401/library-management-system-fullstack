@@ -25,28 +25,17 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http
     ) throws Exception {
-
         http
-
                 .cors(Customizer.withDefaults())
-
                 .csrf(csrf -> csrf.disable())
-
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers(
-                                "/login",
-                                "/register"
+                        .requestMatchers("/login", "/register"
                         ).permitAll()
-
-                        .anyRequest()
-                        .authenticated()
+                        .anyRequest().authenticated()
                 )
-
                 .formLogin(form -> form
                         .successHandler((request, response, authentication) -> {
-                            response.setStatus(200);
-                        })
+                            response.setStatus(200);})
                         .failureHandler((request, response, exception) -> {
                             response.setStatus(401);
                         })
