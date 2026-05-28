@@ -62,7 +62,7 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
+                List.of("library-management-system-fullstack-woad.vercel.app")
         );
 
         configuration.setAllowedMethods(

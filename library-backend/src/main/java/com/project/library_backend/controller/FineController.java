@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "library-management-system-fullstack-woad.vercel.app")
 @RequestMapping("/")
 public class FineController {
 

@@ -60,7 +60,7 @@ const Register = () => {
     try {
       setLoading(true)
 
-      await axios.post('http://localhost:8080/register', {
+      await axios.post('https://library-management-system-fullstack-1.onrender.com/register', {
         username: form.username,
         password: form.password
       })
