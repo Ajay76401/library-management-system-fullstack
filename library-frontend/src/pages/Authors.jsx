@@ -17,8 +17,7 @@ const fetchBooks = async () => {
   
  try {
     const res = await apiFetch("/books")
-    const data = await res.json();
-    setBooks(data);
+    setBooks(res);
   } catch (error) {
     console.log(error);
   }
@@ -31,8 +30,7 @@ const fetchBooks = async () => {
   const fetchAuthors = async () => {
   try {
     const response = await apiFetch("/authors");
-    const data = await response.json();
-    setAuthors(data);
+    setAuthors(response);
   } catch (error) {
     console.log(error);
   }
