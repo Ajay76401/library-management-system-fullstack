@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/")
-@CrossOrigin(origins =  "library-management-system-fullstack-woad.vercel.app")
 public class PublisherController {
 
 

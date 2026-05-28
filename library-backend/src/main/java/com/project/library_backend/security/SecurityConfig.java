@@ -62,7 +62,7 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("library-management-system-fullstack-woad.vercel.app")
+                List.of("https://library-management-system-fullstack-woad.vercel.app")
         );
 
         configuration.setAllowedMethods(

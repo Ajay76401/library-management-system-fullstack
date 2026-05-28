@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "library-management-system-fullstack-woad.vercel.app")
 public class AccountController {
 
     private final AccountService accountService;
