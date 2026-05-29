@@ -102,22 +102,21 @@ if (!emailRegex.test(form.email)) {
 
   const handleDelete = async (id) => {
   if (confirm('Delete this member?')) {
-    try {
-      const response = await apiFetch(
-        `/removemember/${id}`,
-        { method: "DELETE"}
-      );
-      if (!response.ok) {
-        const message =
-          await response.text();
-          alert(message);
-          return;
+      try {
+        const response = await apiFetch(
+          `/removemember/${id}`,
+          { method: "DELETE" }
+        );
+
+        console.log("Response:", response);
+
+        setMembers(members.filter(m => m.id !== id));
+
+      } catch (error) {
+        console.log("ERROR:", error);
+        console.log("Response:", error.response);
+        alert("Failed to delete member");
       }
-      setMembers(members.filter(m => m.id !== id));
-    } catch (error) {
-      console.log(error);
-      alert("Failed to delete member");
-    }
   }
 };
 
