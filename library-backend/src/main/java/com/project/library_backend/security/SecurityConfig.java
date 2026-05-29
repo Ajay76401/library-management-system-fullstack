@@ -41,6 +41,14 @@ public class SecurityConfig {
                             response.setStatus(401);
                         })
                 )
+                .logout(logout -> logout
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        })
+                )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(
                                 (request, response, authException) -> {

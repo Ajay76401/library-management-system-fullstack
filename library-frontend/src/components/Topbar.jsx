@@ -16,16 +16,17 @@ export default function Topbar({ currentPage }) {
     const navigate = useNavigate()
     const handleLogout = async () => {
     try {
-      await axios.post(
-        'https://library-management-system-fullstack-1.onrender.com/logout',
-        {},
-        {
-          withCredentials: true
-        }
-      )
-      navigate('/login')
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/logout`,
+      {},
+      {
+        withCredentials: true
+      }
+    )
+
+    navigate('/login')
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
