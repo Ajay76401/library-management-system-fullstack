@@ -20,11 +20,11 @@ public class MemberService {
     }
 
     public long countOfMember() {
-        return repo.countByActive("Active");
+        return repo.countByStatus("Active");
     }
 
     public List<Member> getMember() {
-        return repo.findByActiveTrue();
+        return repo.findByStatus("Active");
     }
 
     @Transactional

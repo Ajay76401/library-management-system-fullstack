@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member,Integer> {
-    long countByActive(String active);
+    long countByStatus(String active);
 
-    List<Member> findByActiveTrue();
+    List<Member> findByStatus(String active);
 }
