@@ -17,7 +17,7 @@ export default function Topbar({ currentPage }) {
     const handleLogout = async () => {
     try {
       await axios.post(
-        'http://localhost:8080/logout',
+        'https://library-management-system-fullstack-1.onrender.com/logout',
         {},
         {
           withCredentials: true

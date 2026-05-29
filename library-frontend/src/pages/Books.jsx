@@ -241,7 +241,7 @@ const fetchBooks = async () => {
               {!editBook && (
               <div className="form-group">
                 <label className="form-label">Copies</label>
-                <input className="form-input" type="number" min="1" max="500" value={form.totalCopies || 1} onChange={e => setForm({ ...form, totalCopies: e.target.value })} />
+                <input className="form-input" type="number" min="1" max="10" value={form.totalCopies || 1} onChange={e => setForm({ ...form, totalCopies: e.target.value })} />
               </div>
               )}
             </div>
