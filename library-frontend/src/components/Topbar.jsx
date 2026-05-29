@@ -17,7 +17,7 @@ export default function Topbar({ currentPage }) {
     const handleLogout = async () => {
     try {
     await axios.post(
-      `${import.meta.env.VITE_API_URL}/logout`,
+      `https://library-management-system-fullstack-1.onrender.com/logout`,
       {},
       {
         withCredentials: true
