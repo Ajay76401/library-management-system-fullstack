@@ -13,9 +13,7 @@ public class BookcopiesService {
         this.repo = repo;
     }
 
-    public long countOfBooks(){
-        return repo.count();
-    }
+
 
     public long availableBooksCount() {
         return repo.countByStatus("Available") ;

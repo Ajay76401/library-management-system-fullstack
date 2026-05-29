@@ -20,11 +20,11 @@ public class MemberService {
     }
 
     public long countOfMember() {
-        return repo.count();
+        return repo.countByActive("Active");
     }
 
     public List<Member> getMember() {
-        return repo.findAll();
+        return repo.findByActiveTrue();
     }
 
     @Transactional
@@ -53,7 +53,8 @@ public class MemberService {
                     "Cannot delete member with active loans."
             );
         }
-        repo.delete(member);
+       member.setStatus("Suspended");
+        repo.save(member);
     }
 
     @Transactional

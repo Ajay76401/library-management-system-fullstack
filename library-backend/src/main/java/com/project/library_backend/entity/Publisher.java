@@ -19,7 +19,7 @@ public class Publisher {
 	private String name;
 	private String address;
 	private long phone;
-
+	private boolean active =true;
 	@OneToMany(mappedBy = "publisher")
 	@JsonIgnoreProperties("publisher")
 	private List<Book> books;

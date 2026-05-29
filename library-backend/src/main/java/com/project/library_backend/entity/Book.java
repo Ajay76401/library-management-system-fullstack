@@ -21,7 +21,7 @@ public class Book {
 	private double price;
 	private String isbn;
 	private String category;
-
+	private boolean active =true;
 	@ManyToOne
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;

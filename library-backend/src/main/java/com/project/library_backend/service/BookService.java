@@ -12,7 +12,9 @@ import com.project.library_backend.repository.BookRepository;
 import com.project.library_backend.repository.BookcopiesRepository;
 import com.project.library_backend.repository.PublisherRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,8 +72,8 @@ public class BookService {
                     "Cannot delete book. Some copies are currently loaned."
             );
         }
-        bookCopiesRepo.deleteAll(book.getBookCopies());
-        repo.delete(book);
+        book.setActive(false);
+        repo.save(book);
     }
     @Transactional
     public Book updateBook(int id, BookRequest bookRequest) {
@@ -93,13 +95,26 @@ public class BookService {
     }
 
     public List<Book> getBooks() {
-        return repo.findAll();
+        return repo.findByActiveTrue();
     }
 
     public List<Book> availableBooks() {
-        List<Book> all = repo.findAll();
+        List<Book> all = repo.findByActive(true);
         return all.stream().filter(book -> book.getBookCopies().stream().anyMatch(copy -> copy.getStatus()
                 .equalsIgnoreCase("Available"))).toList();
     }
 
+    public long countOfBooks(){
+        List<Book> byActive = repo.findByActive(true);
+       return  byActive.stream().flatMap(book-> book.getBookCopies().stream()).count();
+    }
+
+    public long availableBooksCount() {
+        return repo.findByActive(true)
+                .stream()
+                .flatMap(book -> book.getBookCopies().stream())
+                .filter(copy ->
+                        copy.getStatus().equalsIgnoreCase("Available"))
+                .count();
+    }
 }

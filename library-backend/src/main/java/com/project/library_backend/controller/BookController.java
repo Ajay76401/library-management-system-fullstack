@@ -25,6 +25,11 @@ public class BookController {
         return ResponseEntity.ok(service.getBooks());
     }
 
+    @GetMapping("/countofbooks")
+    public ResponseEntity<Long> countOfBook(){
+        return ResponseEntity.ok(service.countOfBooks());
+    }
+
     @PostMapping("/addbook")
     public ResponseEntity<Book> addBook(@RequestBody BookRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.addBook(request));
@@ -46,5 +51,10 @@ public class BookController {
         return ResponseEntity.ok(service.availableBooks());
 
     }
+    @GetMapping("/availablebookscount")
+    public ResponseEntity<Long> books(){
+        return ResponseEntity.ok(service.availableBooksCount());
+    }
+
 
 }

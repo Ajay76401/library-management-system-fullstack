@@ -43,6 +43,7 @@ public class AuthorController {
 
     @GetMapping("authors")
     public ResponseEntity<List<Author>> getAuthors() {
+
         return ResponseEntity.ok(service.getAuthors());
     }
 }

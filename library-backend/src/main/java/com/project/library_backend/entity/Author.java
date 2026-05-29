@@ -23,9 +23,6 @@
 		@ManyToMany(mappedBy = "authors")
 		@JsonIgnoreProperties("authors")
 		private List<Book> books;
+        private boolean active=true;
 
-		public Author(String name) {
-			super();
-			this.name = name;
-		}
 	}

@@ -1,6 +1,7 @@
 package com.project.library_backend.service;
 
 import com.project.library_backend.entity.Publisher;
+import com.project.library_backend.exception.InvalidOperationException;
 import com.project.library_backend.exception.ResourceNotFoundException;
 import com.project.library_backend.repository.PublisherRepository;
 import jakarta.transaction.Transactional;
@@ -34,14 +35,18 @@ public class PublisherService {
     }
 
     @Transactional
-    public void removePublisher(int id) {
+    public void deletePublisher(int id) {
         Publisher publisher = repo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Publisher not found with id : " + id));
-
-        repo.delete(publisher);
+                        new ResourceNotFoundException("Publisher not found"));
+        if (!publisher.getBooks().isEmpty()) {
+            throw new InvalidOperationException(
+                    "Publisher cannot be deleted because books are associated with it."
+            );
+        }
+        publisher.setActive(false);
+        repo.save(publisher);
     }
-
     public List<Publisher> getPublisher() {
-        return repo.findAll();
+        return repo.findByActiveTrue();
     }
 }

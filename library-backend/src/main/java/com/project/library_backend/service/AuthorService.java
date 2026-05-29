@@ -19,7 +19,7 @@ public class AuthorService {
    }
 
     public long countOfAuthors() {
-        return repo.count();
+        return repo.countByActive(true);
     }
 
     public Author addAuthor(Author author) {
@@ -36,10 +36,11 @@ public class AuthorService {
 
     public void deleteAuthor(int id) {
         Author author = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Author not found with id : " + id));
-        repo.delete(author);
+        author.setActive(false);
+        repo.save(author);
     }
 
     public List<Author> getAuthors() {
-        return repo.findAll();
+        return repo.findByActiveTrue();
     }
 }

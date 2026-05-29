@@ -31,7 +31,7 @@ public class PublisherController {
 
     @DeleteMapping("removepublisher/{id}")
     public ResponseEntity<Void> removePublisher(@PathVariable int id){
-        service.removePublisher( id);
+        service.deletePublisher( id);
         return ResponseEntity.noContent().build();
     }
 

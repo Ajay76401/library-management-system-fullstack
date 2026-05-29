@@ -22,15 +22,7 @@ public class BookcopiesController {
     }
 
 
-    @GetMapping("/countofbooks")
-    public ResponseEntity<Long> countOfBook(){
-        return ResponseEntity.ok(service.countOfBooks());
-    }
 
-    @GetMapping("/availablebookscount")
-    public ResponseEntity<Long> books(){
-        return ResponseEntity.ok(service.availableBooksCount());
-    }
 
 
 
