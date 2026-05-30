@@ -29,7 +29,7 @@ export default function Topbar({ currentPage }) {
       console.error(error)
     }
   }
-
+ alert("backend might take 90 s to open plese be on the this page after backend starts you will be redirect to login page")
   return (
     <div className="topbar">
       <div className="topbar-breadcrumb">
