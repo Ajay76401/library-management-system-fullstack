@@ -38,11 +38,7 @@ public class PublisherService {
     public void deletePublisher(int id) {
         Publisher publisher = repo.findById(id).orElseThrow(() ->
                         new ResourceNotFoundException("Publisher not found"));
-        if (!publisher.getBooks().isEmpty()) {
-            throw new InvalidOperationException(
-                    "Publisher cannot be deleted because books are associated with it."
-            );
-        }
+
         publisher.setActive(false);
         repo.save(publisher);
     }
