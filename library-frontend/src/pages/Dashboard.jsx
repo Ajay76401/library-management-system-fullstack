@@ -1,6 +1,7 @@
 import { AlertTriangle, ArrowRight, BookMarked, BookOpen, Receipt, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { apiFetch } from '../api/api'
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard({ data, onNavigate }) {
  const [totalBooks, setTotalBooks] = useState(0);
@@ -11,6 +12,7 @@ export default function Dashboard({ data, onNavigate }) {
  const [overdueLoans ,setOverdueLoans]  = useState([]);
  const[fines ,setFines] = useState([]);
  const [recentLoans ,setRecentLoans] = useState([]);
+ const navigate = useNavigate
 
  useEffect(()=>{
     apiFetch("/recentloans")
@@ -113,10 +115,10 @@ useEffect(()=>{
           Manage books, members, loans, and fines from a single elegant workspace. Issue and return books in a click — overdue fines calculate automatically.
         </p>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button className="btn-primary" onClick={() => onNavigate('loans')} style={{ borderRadius: 8 }}>
+          <button className="btn-primary" onClick={() => navigate('loans')} style={{ borderRadius: 8 }}>
             Issue a book <ArrowRight size={15} />
           </button>
-          <button className="btn-secondary" onClick={() => onNavigate('books')} style={{ borderRadius: 8, borderColor: 'rgba(245,240,232,0.3)', color: 'var(--cream)' }}>
+          <button className="btn-secondary" onClick={() => navigate('books')} style={{ borderRadius: 8, borderColor: 'rgba(245,240,232,0.3)', color: 'var(--cream)' }}>
             Browse catalog
           </button>
         </div>

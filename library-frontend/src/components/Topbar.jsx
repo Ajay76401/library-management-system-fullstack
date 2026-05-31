@@ -38,7 +38,6 @@ export default function Topbar({ currentPage }) {
         <span>/</span>
         <span className="current">{PAGE_LABELS[currentPage]}</span>
       </div>
-
       <button
         onClick={handleLogout}
         className="logout-btn"
