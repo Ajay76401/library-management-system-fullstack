@@ -115,10 +115,10 @@ useEffect(()=>{
           Manage books, members, loans, and fines from a single elegant workspace. Issue and return books in a click — overdue fines calculate automatically.
         </p>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button className="btn-primary" onClick={() => navigate('loans')} style={{ borderRadius: 8 }}>
+          <button className="btn-primary" onClick={() => navigate('/loans')} style={{ borderRadius: 8 }}>
             Issue a book <ArrowRight size={15} />
           </button>
-          <button className="btn-secondary" onClick={() => navigate('books')} style={{ borderRadius: 8, borderColor: 'rgba(245,240,232,0.3)', color: 'var(--cream)' }}>
+          <button className="btn-secondary" onClick={() => navigate('/books')} style={{ borderRadius: 8, borderColor: 'rgba(245,240,232,0.3)', color: 'var(--cream)' }}>
             Browse catalog
           </button>
         </div>
