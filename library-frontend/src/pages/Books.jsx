@@ -10,6 +10,8 @@ export default function Books({ data, onUpdate }) {
   const [books,setBooks] = useState([]);
   const [authors,setAuthors] = useState([]);  
   const [publishers,setPublishers] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const[deletingId,setDeletingID] = useState(null);
 
   useEffect(() => {
    apiFetch(`/authors`)
@@ -66,6 +68,7 @@ const fetchBooks = async () => {
   };
 
   const handleSave = async () => {
+    if (saving) return;
     if (
         !form.title ||
         !form.authorId ||
@@ -85,6 +88,7 @@ const fetchBooks = async () => {
     }  
 
       try {
+         setSaving(true);
         const bookData = {
           title: form.title,
           yop: Number(form.year),
@@ -118,17 +122,24 @@ const fetchBooks = async () => {
         setShowModal(false);
       } catch (error) {
         console.log(error);
+      }finally{
+           setSaving(false);
       }
 };
 
  const handleDelete = async (id) => {
+  if(deletingId===id)return ;
+
   if (confirm('Delete this book?')) {
     try {
+      setDeletingID(id);
       await apiFetch( `/removebook/${id}`, { method: "DELETE" })
       await fetchBooks()
     } catch (error) {
       console.log(error)
       alert("Something went wrong")
+    }finally{
+      setDeletingID(null);
     }
   }
 }
@@ -188,8 +199,8 @@ const fetchBooks = async () => {
                   {book.bookCopies?.filter(copy => copy.status === "Available").length}/{book.bookCopies?.length} copies · {book.isbn}
                 </span>
                 <div style={{ display: 'flex', gap: 2 }}>
-                  <button className="btn-icon" onClick={() => openEdit(book)}><Pencil size={14} /></button>
-                  <button className="btn-icon danger" onClick={() => handleDelete(book.id)}><Trash2 size={14} /></button>
+                  <button className="btn-icon" onClick={() => openEdit(book)} disabled={deletingId === book.id}><Pencil size={14} /></button>
+                  <button className="btn-icon danger"  onClick={() => handleDelete(book.id)} disabled={deletingId === book.id}><Trash2 size={14} /></button>
                 </div>
               </div>
             </div>
@@ -254,8 +265,24 @@ const fetchBooks = async () => {
               <input className="form-input" value={form.category || ''} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Fiction, Non-Fiction, Sci-Fi…" />
             </div>
             <div className="modal-actions">
-              <button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn-primary" onClick={handleSave}>{editBook ? 'Save Changes' : 'Add Book'}</button>
+            <button
+              className="btn-cancel"
+              onClick={() => setShowModal(false)}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+              <button
+                className="btn-primary"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving
+                  ? "Saving..."
+                  : editBook
+                    ? "Save Changes"
+                    : "Add Book"}
+              </button>
             </div>
           </div>
         </div>
