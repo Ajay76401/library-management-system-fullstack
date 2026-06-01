@@ -10,6 +10,7 @@
       const[availableBooks,setAvailableBooks]=useState([]);
       const[activeMembers,setActiveMembers]=useState([]);
       const [search, setSearch] = useState('');
+      const [issuing, setIssuing] = useState(false);
 
       useEffect(() => {
         apiFetch(`/availablebooks`)
@@ -53,6 +54,9 @@
       };
 
     const handleIssue = async () => {
+
+      if(issuing) return ;
+
       if (!form.bookId || !form.memberId) {
         alert("Please select book and member");
         return;
@@ -62,6 +66,7 @@
       }
     
       try {
+        setIssuing(true);
         await apiFetch("/addloan",{
             method: "POST",
             headers: {"Content-Type":"application/json"},
@@ -77,10 +82,11 @@
         const updatedLoans =  await apiFetch("/loans");
         setLoans(updatedLoans);
         setShowModal(false);
-        window.location.reload();
       } catch(error) {
         console.log(error);
         alert("Failed to issue book");
+      }finally{
+        setIssuing(false);
       }
     };
 
