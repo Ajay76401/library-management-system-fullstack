@@ -12,7 +12,7 @@ export default function Dashboard({ data, onNavigate }) {
  const [overdueLoans ,setOverdueLoans]  = useState([]);
  const[fines ,setFines] = useState([]);
  const [recentLoans ,setRecentLoans] = useState([]);
- const navigate = useNavigate
+ const navigate = useNavigate();
 
  useEffect(()=>{
     apiFetch("/recentloans")
