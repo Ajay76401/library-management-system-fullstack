@@ -15,14 +15,14 @@ export default function Dashboard({ data, onNavigate }) {
  const [recentLoans ,setRecentLoans] = useState([]);
  const navigate = useNavigate();
 
-useEffect(() => {
   if (message) {
     alert(
       "Backend might take 90 s to open. Please stay on this page. After the backend starts, you will be redirected to the login page."
     );
-    setMessage(false);
+    
   }
-}, [message]);
+  setMessage(false);
+
  
  useEffect(()=>{
     apiFetch("/recentloans")
