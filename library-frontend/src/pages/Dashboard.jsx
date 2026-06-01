@@ -11,9 +11,19 @@ export default function Dashboard({ data, onNavigate }) {
  const [activeLoans ,setActiveLoans] = useState(0);
  const [overdueLoans ,setOverdueLoans]  = useState([]);
  const[fines ,setFines] = useState([]);
+ const[message ,setMessage] = useState(true);
  const [recentLoans ,setRecentLoans] = useState([]);
  const navigate = useNavigate();
 
+useEffect(() => {
+  if (message) {
+    alert(
+      "Backend might take 90 s to open. Please stay on this page. After the backend starts, you will be redirected to the login page."
+    );
+    setMessage(false);
+  }
+}, [message]);
+ 
  useEffect(()=>{
     apiFetch("/recentloans")
     .then(data => setRecentLoans(data))
@@ -60,8 +70,6 @@ useEffect(()=>{
     .then(data => setOverdueLoans(data))
     .catch(err => console.log(err))
  },[])
- alert("backend might take 90 s to open plese be on the this page after backend starts you will be redirect to login page")
-
   const unpaidFines =fines.filter(f=>f.status!=="Paid")
   const unpaidTotal = unpaidFines.reduce((sum,fine)=>sum+fine.amount,0);
 
