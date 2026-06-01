@@ -206,7 +206,11 @@
                 </div>
                 <div className="modal-actions">
                   <button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
-                  <button className="btn-primary" onClick={handleIssue}>Issue Book</button>
+                 <button className="btn-primary"
+                         onClick={handleIssue}
+                         disabled={issuing}>
+                        {issuing ? "Issuing..." : "Issue Book"}
+                  </button>
                 </div>
               </div>
             </div>
